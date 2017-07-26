@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "AWS in Action: chapter 9",
+	"Description": "AWS in Action: chapter 11",
 	"Parameters": {
 		"KeyName": {
 			"Description": "Key Pair name",

@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS in Action: chapter 10'
+Description: 'AWS in Action: chapter 10 (with backup)'
 Parameters:
   KeyName:
     Description: Key Pair name

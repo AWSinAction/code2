@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion": "2010-09-09",
-	"Description": "AWS in Action: chapter 8 (Instance Store)",
+	"Description": "AWS in Action: chapter 9 (Instance Store)",
 	"Parameters": {
 		"KeyName": {
 			"Description": "Key Pair name",
