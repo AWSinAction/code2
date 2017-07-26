@@ -219,7 +219,7 @@
         "Description": "Imagery worker: AWS in Action: chapter 13",
         "SourceBundle": {
           "S3Bucket": "awsinaction",
-          "S3Key": "chapter13/build/worker.zip"
+          "S3Key": "chapter16/build/worker.zip"
         }
       }
     },
@@ -381,7 +381,7 @@
         "Description": "Imagery server: AWS in Action: chapter 13",
         "SourceBundle": {
           "S3Bucket": "awsinaction",
-          "S3Key": "chapter13/build/server.zip"
+          "S3Key": "chapter16/build/server.zip"
         }
       }
     }
