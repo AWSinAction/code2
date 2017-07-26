@@ -6,6 +6,10 @@ Parameters:
     Description: Key Pair name
     Type: 'AWS::EC2::KeyPair::KeyName'
     Default: mykey
+  EBSBackupVolumeSize:
+    Description: 'The size of the EBS backup volume, in gibibytes (GiBs).'
+    Type: Number
+    Default: 5
 Mappings:
   RegionMap:
     'ap-south-1':
@@ -172,9 +176,33 @@ Resources:
         IpProtocol: tcp
         ToPort: 22
       VpcId: !Ref VPC
+  InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+      - !Ref Role
+  Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'ec2.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ec2
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: 'ec2:CreateSnapshot'
+            Resource: '*'
   EC2InstanceA:
     Type: 'AWS::EC2::Instance'
     Properties:
+      IamInstanceProfile: !Ref InstanceProfile
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
       InstanceType: 't2.micro'
       KeyName: !Ref KeyName
@@ -200,12 +228,32 @@ Resources:
 
             # mount EFS file system
             echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
-            mount -a
+            mount -a 
 
             # copy /oldhome to new /home
             cp -a /oldhome/. /home
           TRY
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2InstanceA --region ${AWS::Region}
+
+          # wait until EBS volume is attached
+          while ! [ "`fdisk -l | grep '/dev/xvdf' | wc -l`" -ge "1" ]; do sleep 10; done
+
+          # format EBS volume if needed
+          if [[ "`file -s /dev/xvdf`" != *"ext4"* ]]; then mkfs -t ext4 /dev/xvdf; fi
+
+          # mount EBS volume
+          mkdir /mnt/backup
+          echo "/dev/xvdf /mnt/backup ext4 defaults,nofail 0 2" >> /etc/fstab
+          mount -a
+
+          # install backup cron
+          cat > /etc/cron.d/backup << EOF
+          SHELL=/bin/bash
+          PATH=/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin
+          MAILTO=root
+          HOME=/
+          */15 * * * * root rsync -av --delete /home/ /mnt/backup/ ; fsfreeze -f /mnt/backup/ ; aws --region ${AWS::Region} ec2 create-snapshot --volume-id ${EBSBackupVolumeA} --description "EFS backup" ; fsfreeze -u /mnt/backup/
+          EOF
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
@@ -245,6 +293,18 @@ Resources:
     DependsOn: 
     - VPCGatewayAttachment
     - MountTargetB
+  EBSBackupVolumeA:
+    Type: 'AWS::EC2::Volume'
+    Properties:
+      AvailabilityZone: !GetAtt 'EC2InstanceA.AvailabilityZone'
+      Size: !Ref EBSBackupVolumeSize
+      VolumeType: gp2
+  EBSBackupVolumeAttachmentA: 
+    Type: 'AWS::EC2::VolumeAttachment'
+    Properties:
+      Device: '/dev/xvdf'
+      InstanceId: !Ref EC2InstanceA
+      VolumeId: !Ref EBSBackupVolumeA
 Outputs:
   EC2InstanceAIPAddress:
     Value: !GetAtt 'EC2InstanceA.PublicIp'
