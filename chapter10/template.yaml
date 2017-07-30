@@ -128,7 +128,7 @@ Resources:
   FileSystem:
     Type: 'AWS::EFS::FileSystem'
     Properties: {}
-  MountTargetClientSecurityGroup:
+  EFSClientSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupDescription: 'EFS Mount target client'
@@ -140,7 +140,7 @@ Resources:
       SecurityGroupIngress:
       - FromPort: 2049
         IpProtocol: tcp
-        SourceSecurityGroupId: !Ref MountTargetClientSecurityGroup
+        SourceSecurityGroupId: !Ref EFSClientSecurityGroup
         ToPort: 2049
       VpcId: !Ref VPC
   MountTargetA:
@@ -184,7 +184,7 @@ Resources:
         DeviceIndex: 0
         GroupSet:
         - !Ref EC2SecurityGroup
-        - !Ref MountTargetClientSecurityGroup
+        - !Ref EFSClientSecurityGroup
         SubnetId: !Ref SubnetA
       UserData:
         'Fn::Base64': !Sub |
@@ -224,7 +224,7 @@ Resources:
         DeviceIndex: 0
         GroupSet:
         - !Ref EC2SecurityGroup
-        - !Ref MountTargetClientSecurityGroup
+        - !Ref EFSClientSecurityGroup
         SubnetId: !Ref SubnetB
       UserData:
         'Fn::Base64': !Sub |
