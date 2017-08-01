@@ -217,7 +217,7 @@ Resources:
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash -x
-          bash -ex <<TRY
+          bash -ex << "TRY"
             # wait until EFS file system is available
             while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
             sleep 10
@@ -277,7 +277,7 @@ Resources:
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash -x
-          bash -ex <<TRY
+          bash -ex << "TRY"
             # wait until EFS file system is available
             while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
             sleep 10
