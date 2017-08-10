@@ -296,7 +296,7 @@ Resources:
   EBSBackupVolumeA:
     Type: 'AWS::EC2::Volume'
     Properties:
-      AvailabilityZone: !GetAtt 'EC2InstanceA.AvailabilityZone'
+      AvailabilityZone: !Select [0, !GetAZs '']
       Size: !Ref EBSBackupVolumeSize
       VolumeType: gp2
   EBSBackupVolumeAttachmentA:
