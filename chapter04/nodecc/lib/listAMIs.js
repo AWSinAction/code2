@@ -8,7 +8,7 @@ module.exports = function(cb) {
 	ec2.describeImages({
 		"Filters": [{
 			"Name": "description",
-			"Values": ["Amazon Linux AMI 2015.03.? x86_64 HVM GP2"]
+			"Values": ["Amazon Linux AMI 2017.03.1.* x86_64 HVM GP2"]
 		}]
 	}, function(err, data) {
 		if (err) {
