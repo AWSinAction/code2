@@ -242,7 +242,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
-    DependsOn: 
+    DependsOn:
     - VPCGatewayAttachment
     - MountTargetB
 Outputs:

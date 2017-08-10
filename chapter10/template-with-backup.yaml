@@ -228,7 +228,7 @@ Resources:
 
             # mount EFS file system
             echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
-            mount -a 
+            mount -a
 
             # copy /oldhome to new /home
             cp -a /oldhome/. /home
@@ -290,7 +290,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
-    DependsOn: 
+    DependsOn:
     - VPCGatewayAttachment
     - MountTargetB
   EBSBackupVolumeA:
@@ -299,7 +299,7 @@ Resources:
       AvailabilityZone: !GetAtt 'EC2InstanceA.AvailabilityZone'
       Size: !Ref EBSBackupVolumeSize
       VolumeType: gp2
-  EBSBackupVolumeAttachmentA: 
+  EBSBackupVolumeAttachmentA:
     Type: 'AWS::EC2::VolumeAttachment'
     Properties:
       Device: '/dev/xvdf'
