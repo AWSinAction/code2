@@ -3,8 +3,6 @@
 #param IPSEC_PSK the shared secret
 #param VPN_USER the vpn username
 #param VPN_PASSWORD the vpn password
-#param STACK_NAME
-#param REGION
  
 PRIVATE_IP=`curl -s http://169.254.169.254/latest/meta-data/local-ipv4`
 PUBLIC_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
@@ -97,5 +95,3 @@ EOF
 
 service ipsec start && service xl2tpd start
 chkconfig ipsec on && chkconfig xl2tpd on
-
-/opt/aws/bin/cfn-signal --stack $STACK_NAME --resource EC2Instance --region $REGION
