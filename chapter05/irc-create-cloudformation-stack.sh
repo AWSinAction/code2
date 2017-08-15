@@ -1,9 +1,6 @@
 #!/bin/bash -ex
 
-vpc=$(aws ec2 describe-vpcs --filter "Name=isDefault, Values=true" --query "Vpcs[0].VpcId" --output text)
-aws cloudformation create-stack --stack-name irc --template-url https://s3.amazonaws.com/awsinaction-code2/chapter05/irc-cloudformation.json --parameters ParameterKey=VPC,ParameterValue=$vpc
+VpcId=$(aws ec2 describe-vpcs --filter "Name=isDefault, Values=true" --query "Vpcs[0].VpcId" --output text)
+aws cloudformation create-stack --stack-name irc --template-url https://s3.amazonaws.com/awsinaction-code2/chapter05/irc-cloudformation.yaml --parameters ParameterKey=VPC,ParameterValue=$VpcId
 
-while [[ `aws cloudformation describe-stacks --stack-name irc --query Stacks[0].StackStatus` != *"COMPLETE"* ]]
-do
-	sleep 10
-done
+aws cloudformation wait stack-create-complete --stack-name irc
