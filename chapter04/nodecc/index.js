@@ -59,7 +59,7 @@ var list = blessed.list({
 	keys: true,
 	vi: true,
 	label: 'actions',
-	items: ['list servers', 'create server', 'terminate server']
+	items: ['list virtual machines', 'create virtual machine', 'terminate virtual machine']
 });
 list.on('select', function(ev, i) {
 	content.border.type = 'line';
@@ -74,10 +74,10 @@ function open(i) {
 	screen.log('open(' + i + ')');
 	if (i === 0) {
 		loading();
-		require('./lib/listServers.js')(function(err, instanceIds) {
+		require('./lib/listVMs.js')(function(err, instanceIds) {
 			loaded();
 			if (err) {
-				log('error', 'listServers cb err: ' + err);
+				log('error', 'listVMs cb err: ' + err);
 			} else {
 				var instanceList = blessed.list({
 					fg: 'white',
@@ -92,12 +92,12 @@ function open(i) {
 				instanceList.focus();
 				instanceList.on('select', function(ev, i) {
 					loading();
-					require('./lib/showServer.js')(instanceIds[i], function(err, instance) {
+					require('./lib/showVM.js')(instanceIds[i], function(err, instance) {
 						loaded();
 						if (err) {
-							log('error', 'showServer cb err: ' + err);
+							log('error', 'showVM cb err: ' + err);
 						} else {
-							var serverContent = blessed.box({  
+							var vmContent = blessed.box({  
 								fg: 'white',
 								bg: 'blue',
 								content:
@@ -107,7 +107,7 @@ function open(i) {
 									'ImageId: ' + instance.ImageId + '\n' +
 									'PublicDnsName: ' + instance.PublicDnsName
 							});
-							content.append(serverContent);
+							content.append(vmContent);
 						}
 						screen.render(); 
 					});
@@ -155,17 +155,17 @@ function open(i) {
 							subnetList.focus();
 							subnetList.on('select', function(ev, i) {
 								loading();
-								require('./lib/createServer.js')(amiId, subnetIds[i], function(err) {
+								require('./lib/createVM.js')(amiId, subnetIds[i], function(err) {
 									loaded();
 									if (err) {
-										log('error', 'createServer cb err: ' + err);
+										log('error', 'createVM cb err: ' + err);
 									} else {
-										var serverContent = blessed.box({  
+										var vmContent = blessed.box({  
 											fg: 'white',
 											bg: 'blue',
 											content: 'starting ...'
 										});
-										content.append(serverContent);
+										content.append(vmContent);
 									}
 									screen.render(); 
 								});
@@ -181,10 +181,10 @@ function open(i) {
 		});
 	} else if (i === 2) {
 		loading();
-		require('./lib/listServers.js')(function(err, instanceIds) {
+		require('./lib/listVMs.js')(function(err, instanceIds) {
 			loaded();
 			if (err) {
-				log('error', 'listServers cb err: ' + err);
+				log('error', 'listVMs cb err: ' + err);
 			} else {
 				var instanceList = blessed.list({
 					fg: 'white',
@@ -199,17 +199,17 @@ function open(i) {
 				instanceList.focus();
 				instanceList.on('select', function(ev, i) {
 					loading();
-					require('./lib/terminateServer.js')(instanceIds[i], function(err) {
+					require('./lib/terminateVM.js')(instanceIds[i], function(err) {
 						loaded();
 						if (err) {
-							log('error', 'terminateServer cb err: ' + err);
+							log('error', 'terminateVM cb err: ' + err);
 						} else {
-							var serverContent = blessed.box({  
+							var vmContent = blessed.box({  
 								fg: 'white',
 								bg: 'blue',
 								content: 'terminating ...'
 							});
-							content.append(serverContent);
+							content.append(vmContent);
 						}
 						screen.render(); 
 					});

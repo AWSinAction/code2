@@ -58,7 +58,7 @@ Resources:
         FromPort: 22
         IpProtocol: tcp
         ToPort: 22
-  Server:
+  VM:
     Type: 'AWS::EC2::Instance'
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
@@ -68,5 +68,5 @@ Resources:
       SubnetId: !Ref Subnet
 Outputs:
   PublicName:
-    Value: !GetAtt 'Server.PublicDnsName'
+    Value: !GetAtt 'VM.PublicDnsName'
     Description: 'Public name (connect via SSH as user ec2-user)'

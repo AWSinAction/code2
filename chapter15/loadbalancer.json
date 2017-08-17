@@ -7,8 +7,8 @@
 			"Type": "AWS::EC2::KeyPair::KeyName",
 			"Default": "mykey"
 		},
-		"NumberOfServers": {
-			"Description": "Number of servers",
+		"NumberOfVirtualMachines": {
+			"Description": "Number of virtual machines",
 			"Type": "Number",
 			"Default": "2",
 			"MinValue": "2",
@@ -226,9 +226,9 @@
 			"Properties": {
 				"LoadBalancerNames": [{"Ref": "LoadBalancer"}],
 				"LaunchConfigurationName": {"Ref": "LaunchConfiguration"},
-				"MinSize": {"Ref": "NumberOfServers"},
-				"MaxSize": {"Ref": "NumberOfServers"},
-				"DesiredCapacity": {"Ref": "NumberOfServers"},
+				"MinSize": {"Ref": "NumberOfVirtualMachines"},
+				"MaxSize": {"Ref": "NumberOfVirtualMachines"},
+				"DesiredCapacity": {"Ref": "NumberOfVirtualMachines"},
 				"VPCZoneIdentifier": [{"Ref": "Subnet"}]
 			},
 			"CreationPolicy": {
