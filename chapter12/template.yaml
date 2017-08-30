@@ -3,7 +3,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS in Action: chapter 12'
 Parameters:
   KeyName:
-    Description: Key Pair name
+    Description: 'Key Pair name'
     Type: 'AWS::EC2::KeyPair::KeyName'
     Default: mykey
   AdminEmailAddress:
@@ -133,7 +133,7 @@ Resources:
     Properties:
       GroupDescription: cache
       VpcId: !Ref VPC
-  CacheSecurityGroupIngress5432:
+  CacheSecurityGroupIngress:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !Ref CacheSecurityGroup
@@ -168,7 +168,7 @@ Resources:
     Properties:
       GroupDescription: database
       VpcId: !Ref VPC
-  DatabaseSecurityGroupIngress5432:
+  DatabaseSecurityGroupIngress:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:
       GroupId: !Ref DatabaseSecurityGroup
