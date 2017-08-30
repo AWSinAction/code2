@@ -1,3 +1,4 @@
+---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS in Action: chapter 12 (minimal)'
 Parameters:
@@ -60,7 +61,7 @@ Resources:
     Properties:
       Description: cache
       SubnetIds:
-      - Ref: SubnetA 
+      - Ref: SubnetA
       - Ref: SubnetB
   Cache:
     Type: 'AWS::ElastiCache::CacheCluster'
