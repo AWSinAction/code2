@@ -72,17 +72,17 @@ Resources:
       NumCacheNodes: 1
       VpcSecurityGroupIds:
       - !Ref CacheSecurityGroup
-  InstanceSecurityGroup:
+  VMSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: 'instance'
+      GroupDescription: 'vm'
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: '0.0.0.0/0'
       VpcId: !Ref VPC
-  Instance:
+  VMInstance:
     Type: 'AWS::EC2::Instance'
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
@@ -93,12 +93,12 @@ Resources:
         DeleteOnTermination: true
         DeviceIndex: 0
         GroupSet:
-        - !Ref InstanceSecurityGroup
+        - !Ref VMSecurityGroup
         SubnetId: !Ref SubnetA
 Outputs:
-  InstanceIPAddress:
-    Value: !GetAtt 'Instance.PublicIp'
+  VMInstanceIPAddress:
+    Value: !GetAtt 'VMInstance.PublicIp'
     Description: 'EC2 Instance public IP address (connect via SSH as user ec2-user)'
-  CacheIPAddress:
+  CacheAddress:
     Value: !GetAtt 'Cache.RedisEndpoint.Address'
-    Description: 'Redis private IP address'
+    Description: 'Redis DNS name (resolves to a private IP address)'
