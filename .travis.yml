@@ -10,7 +10,7 @@ python:
 install:
 - 'pip install yamllint'
 - 'pip install awscli'
-- 'apt-get install shellcheck'
+- 'sudo apt-get install -y shellcheck'
 script:
 - 'yamllint .'
 - 'find . -type f -name ''*.sh'' | while read file; do set -ex && shellcheck -s bash "$file"; done'
