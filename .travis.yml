@@ -10,5 +10,8 @@ python:
 install:
 - 'pip install yamllint'
 - 'pip install awscli'
+- 'apt-get install shellcheck'
 script:
-- 'yamllint . && find . -type f -name ''*.sh'' -exec shellcheck -s bash {} \; && find . -type f -name ''*.y?ml'' -exec aws cloudformation validate-template --template-body file://{} \;'
+- 'yamllint .'
+- 'find . -type f -name ''*.sh'' | while read file; do set -ex && shellcheck -s bash "$file"; done'
+- 'find . -type f -name ''*.y?ml'' | while read file; do set -ex && aws cloudformation validate-template --template-body "file://$file" > /dev/null; done'
