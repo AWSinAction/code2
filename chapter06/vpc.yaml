@@ -40,7 +40,7 @@ Resources:
   SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: 'My security group'
+      GroupDescription: 'Allowing all incoming and outgoing traffic.'
       VpcId: !Ref VPC
       SecurityGroupIngress:
         IpProtocol: '-1'
@@ -52,11 +52,17 @@ Resources:
         FromPort: '-1'
         ToPort: '-1'
         CidrIp: '0.0.0.0/0'
+      Tags:
+      - Key: Name
+        Value: default
   VPC:
     Type: 'AWS::EC2::VPC'
     Properties:
       CidrBlock: '10.0.0.0/16'
       EnableDnsHostnames: 'true'
+      Tags:
+      - Key: Name
+        Value: 'AWS in Action: chapter 6 (VPC)'
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
     Properties: {}
@@ -71,6 +77,9 @@ Resources:
       AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: '10.0.0.0/24'
       VpcId: !Ref VPC
+      Tags:
+      - Key: Name
+        Value: 'Public NAT'
   RouteTablePublicNAT:
     Type: 'AWS::EC2::RouteTable'
     Properties:
@@ -168,41 +177,44 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  SubnetPublicSSHBastion:
+  SubnetPublicBastionHost:
     Type: 'AWS::EC2::Subnet'
     Properties:
       AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: '10.0.1.0/24'
       VpcId: !Ref VPC
-  RouteTablePublicSSHBastion:
+      Tags:
+      - Key: Name
+        Value: 'Public Bastion Host'
+  RouteTablePublicBastionHost:
     Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
-  RouteTableAssociationPublicSSHBastion:
+  RouteTableAssociationPublicBastionHost:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref SubnetPublicSSHBastion
-      RouteTableId: !Ref RouteTablePublicSSHBastion
-  RoutePublicSSHBastionToInternet:
+      SubnetId: !Ref SubnetPublicBastionHost
+      RouteTableId: !Ref RouteTablePublicBastionHost
+  RoutePublicBastionHostToInternet:
     Type: 'AWS::EC2::Route'
     Properties:
-      RouteTableId: !Ref RouteTablePublicSSHBastion
+      RouteTableId: !Ref RouteTablePublicBastionHost
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref InternetGateway
     DependsOn: VPCGatewayAttachment
-  NetworkAclPublicSSHBastion:
+  NetworkAclPublicBastionHost:
     Type: 'AWS::EC2::NetworkAcl'
     Properties:
       VpcId: !Ref VPC
-  SubnetNetworkAclAssociationPublicSSHBastion:
+  SubnetNetworkAclAssociationPublicBastionHost:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
-      SubnetId: !Ref SubnetPublicSSHBastion
-      NetworkAclId: !Ref NetworkAclPublicSSHBastion
-  NetworkAclEntryInPublicSSHBastionSSH:
+      SubnetId: !Ref SubnetPublicBastionHost
+      NetworkAclId: !Ref NetworkAclPublicBastionHost
+  NetworkAclEntryInPublicBastionHostSSH:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicSSHBastion
+      NetworkAclId: !Ref NetworkAclPublicBastionHost
       RuleNumber: '100'
       Protocol: '6'
       PortRange:
@@ -211,10 +223,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryInPublicSSHBastionEphemeralPorts:
+  NetworkAclEntryInPublicBastionHostEphemeralPorts:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicSSHBastion
+      NetworkAclId: !Ref NetworkAclPublicBastionHost
       RuleNumber: '200'
       Protocol: '6'
       PortRange:
@@ -223,10 +235,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: '10.0.0.0/16'
-  NetworkAclEntryOutPublicSSHBastionSSH:
+  NetworkAclEntryOutPublicBastionHostSSH:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicSSHBastion
+      NetworkAclId: !Ref NetworkAclPublicBastionHost
       RuleNumber: '100'
       Protocol: '6'
       PortRange:
@@ -235,10 +247,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '10.0.0.0/16'
-  NetworkAclEntryOutPublicSSHBastionEphemeralPorts:
+  NetworkAclEntryOutPublicBastionHostEphemeralPorts:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicSSHBastion
+      NetworkAclId: !Ref NetworkAclPublicBastionHost
       RuleNumber: '200'
       Protocol: '6'
       PortRange:
@@ -247,41 +259,44 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  SubnetPublicVarnish:
+  SubnetPublicVarnishProxy:
     Type: 'AWS::EC2::Subnet'
     Properties:
       AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: '10.0.2.0/24'
       VpcId: !Ref VPC
-  RouteTablePublicVarnish:
+      Tags:
+      - Key: Name
+        Value: 'Public Varnish Proxy'
+  RouteTablePublicVarnishProxy:
     Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
-  RouteTableAssociationPublicVarnish:
+  RouteTableAssociationPublicVarnishProxy:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref SubnetPublicVarnish
-      RouteTableId: !Ref RouteTablePublicVarnish
-  RoutePublicVarnishToInternet:
+      SubnetId: !Ref SubnetPublicVarnishProxy
+      RouteTableId: !Ref RouteTablePublicVarnishProxy
+  RoutePublicVarnishProxyToInternet:
     Type: 'AWS::EC2::Route'
     Properties:
-      RouteTableId: !Ref RouteTablePublicVarnish
+      RouteTableId: !Ref RouteTablePublicVarnishProxy
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref InternetGateway
     DependsOn: VPCGatewayAttachment
-  NetworkAclPublicVarnish:
+  NetworkAclPublicVarnishProxy:
     Type: 'AWS::EC2::NetworkAcl'
     Properties:
       VpcId: !Ref VPC
-  SubnetNetworkAclAssociationPublicVarnish:
+  SubnetNetworkAclAssociationPublicVarnishProxy:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
-      SubnetId: !Ref SubnetPublicVarnish
-      NetworkAclId: !Ref NetworkAclPublicVarnish
-  NetworkAclEntryInPublicVarnishSSH:
+      SubnetId: !Ref SubnetPublicVarnishProxy
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
+  NetworkAclEntryInPublicVarnishProxySSH:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicVarnish
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
       RuleNumber: '100'
       Protocol: '6'
       PortRange:
@@ -290,10 +305,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: 10.0.1.0/24
-  NetworkAclEntryInPublicVarnishHTTP:
+  NetworkAclEntryInPublicVarnishProxyHTTP:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicVarnish
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
       RuleNumber: '110'
       Protocol: '6'
       PortRange:
@@ -302,10 +317,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryInPublicVarnishEphemeralPorts:
+  NetworkAclEntryInPublicVarnishProxyEphemeralPorts:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicVarnish
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
       RuleNumber: '200'
       Protocol: '6'
       PortRange:
@@ -314,10 +329,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryOutPublicVarnishHTTP:
+  NetworkAclEntryOutPublicVarnishProxyHTTP:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicVarnish
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
       RuleNumber: '100'
       Protocol: '6'
       PortRange:
@@ -326,10 +341,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryOutPublicVarnishHTTPS:
+  NetworkAclEntryOutPublicVarnishProxyHTTPS:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicVarnish
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
       RuleNumber: '110'
       Protocol: '6'
       PortRange:
@@ -338,10 +353,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryOutPublicVarnishEphemeralPorts:
+  NetworkAclEntryOutPublicVarnishProxyEphemeralPorts:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPublicVarnish
+      NetworkAclId: !Ref NetworkAclPublicVarnishProxy
       RuleNumber: '200'
       Protocol: '6'
       PortRange:
@@ -350,40 +365,43 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  SubnetPrivateApache:
+  SubnetPrivateApacheWebserver:
     Type: 'AWS::EC2::Subnet'
     Properties:
       AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: '10.0.3.0/24'
       VpcId: !Ref VPC
-  RouteTablePrivateApache:
+      Tags:
+      - Key: Name
+        Value: 'Private Apache Webserver'
+  RouteTablePrivateApacheWebserver:
     Type: 'AWS::EC2::RouteTable'
     Properties:
       VpcId: !Ref VPC
-  RouteTableAssociationPrivateApache:
+  RouteTableAssociationPrivateApacheWebserver:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref SubnetPrivateApache
-      RouteTableId: !Ref RouteTablePrivateApache
-  RoutePrivateApacheToInternet:
+      SubnetId: !Ref SubnetPrivateApacheWebserver
+      RouteTableId: !Ref RouteTablePrivateApacheWebserver
+  RoutePrivateApacheWebserverToInternet:
     Type: 'AWS::EC2::Route'
     Properties:
-      RouteTableId: !Ref RouteTablePrivateApache
+      RouteTableId: !Ref RouteTablePrivateApacheWebserver
       DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref NatGateway
-  NetworkAclPrivateApache:
+  NetworkAclPrivateApacheWebserver:
     Type: 'AWS::EC2::NetworkAcl'
     Properties:
       VpcId: !Ref VPC
-  SubnetNetworkAclAssociationPrivateApache:
+  SubnetNetworkAclAssociationPrivateApacheWebserver:
     Type: 'AWS::EC2::SubnetNetworkAclAssociation'
     Properties:
-      SubnetId: !Ref SubnetPrivateApache
-      NetworkAclId: !Ref NetworkAclPrivateApache
-  NetworkAclEntryInPrivateApacheSSH:
+      SubnetId: !Ref SubnetPrivateApacheWebserver
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
+  NetworkAclEntryInPrivateApacheWebserverSSH:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPrivateApache
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
       RuleNumber: '100'
       Protocol: '6'
       PortRange:
@@ -392,10 +410,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: 10.0.1.0/24
-  NetworkAclEntryInPrivateApacheHTTP:
+  NetworkAclEntryInPrivateApacheWebserverHTTP:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPrivateApache
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
       RuleNumber: '110'
       Protocol: '6'
       PortRange:
@@ -404,10 +422,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: '10.0.2.0/24'
-  NetworkAclEntryInPrivateApacheEphemeralPorts:
+  NetworkAclEntryInPrivateApacheWebserverEphemeralPorts:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPrivateApache
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
       RuleNumber: '200'
       Protocol: '6'
       PortRange:
@@ -416,10 +434,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'false'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryOutPrivateApacheHTTP:
+  NetworkAclEntryOutPrivateApacheWebserverHTTP:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPrivateApache
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
       RuleNumber: '100'
       Protocol: '6'
       PortRange:
@@ -428,10 +446,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryOutPrivateApacheHTTPS:
+  NetworkAclEntryOutPrivateApacheWebserverHTTPS:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPrivateApache
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
       RuleNumber: '110'
       Protocol: '6'
       PortRange:
@@ -440,10 +458,10 @@ Resources:
       RuleAction: 'allow'
       Egress: 'true'
       CidrBlock: '0.0.0.0/0'
-  NetworkAclEntryOutPrivateApacheEphemeralPorts:
+  NetworkAclEntryOutPrivateApacheWebserverEphemeralPorts:
     Type: 'AWS::EC2::NetworkAclEntry'
     Properties:
-      NetworkAclId: !Ref NetworkAclPrivateApache
+      NetworkAclId: !Ref NetworkAclPrivateApacheWebserver
       RuleNumber: '200'
       Protocol: '6'
       PortRange:
@@ -470,12 +488,15 @@ Resources:
       NetworkInterfaces:
       - AssociatePublicIpAddress: 'true'
         DeleteOnTermination: 'true'
-        SubnetId: !Ref SubnetPublicSSHBastion
+        SubnetId: !Ref SubnetPublicBastionHost
         DeviceIndex: '0'
         GroupSet:
         - !Ref SecurityGroup
+      Tags:
+      - Key: Name
+        Value: 'Bastion Host'
     DependsOn: VPCGatewayAttachment
-  VarnishServer:
+  VarnishProxy:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
@@ -484,7 +505,7 @@ Resources:
       NetworkInterfaces:
       - AssociatePublicIpAddress: 'true'
         DeleteOnTermination: 'true'
-        SubnetId: !Ref SubnetPublicVarnish
+        SubnetId: !Ref SubnetPublicVarnishProxy
         DeviceIndex: '0'
         GroupSet:
         - !Ref SecurityGroup
@@ -494,18 +515,21 @@ Resources:
           yum -y install varnish-3.0.7
           cat > /etc/varnish/default.vcl << EOF
           backend default {
-            .host = "${ApacheServer.PrivateIp}";
+            .host = "${ApacheWebserver.PrivateIp}";
             .port = "80";
           }
           EOF
-          sed -i.bak \"s/^VARNISH_LISTEN_PORT=.*/VARNISH_LISTEN_PORT=8ysconfig/varnish
+          sed -i.bak "s/^VARNISH_LISTEN_PORT=.*/VARNISH_LISTEN_PORT=80/" /etc/sysconfig/varnish
           service varnish start
-          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource VarnishServer --region ${AWS::Region} 
+          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region} 
+      Tags:
+      - Key: Name
+        Value: 'Varnish Proxy'
     CreationPolicy:
       ResourceSignal:
         Timeout: PT5M
     DependsOn: VPCGatewayAttachment
-  ApacheServer:
+  ApacheWebserver:
     Type: 'AWS::EC2::Instance'
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
@@ -514,7 +538,7 @@ Resources:
       NetworkInterfaces:
       - AssociatePublicIpAddress: 'false'
         DeleteOnTermination: 'true'
-        SubnetId: !Ref SubnetPrivateApache
+        SubnetId: !Ref SubnetPrivateApacheWebserver
         DeviceIndex: '0'
         GroupSet:
         - !Ref SecurityGroup
@@ -523,21 +547,24 @@ Resources:
           #!/bin/bash -ex
           yum -y install httpd
           service httpd start
-          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource ApacheServer --region ${AWS::Region} 
+          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region} 
+      Tags:
+      - Key: Name
+        Value: 'Apache Webserver'
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
-    DependsOn: RoutePrivateApacheToInternet
+    DependsOn: RoutePrivateApacheWebserverToInternet
 Outputs:
   BastionHostPublicName:
     Value: !Sub ${BastionHost.PublicDnsName}
-    Description: connect via SSH as user ec2-user
-  VarnishServerPublicName:
-    Value: !Sub ${VarnishServer.PublicDnsName}
-    Description: handles HTTP requests
-  VarnishServerPrivateIp:
-    Value: !Sub ${VarnishServer.PrivateIp}
-    Description: connect via SSH from bastion host
-  ApacheServerPrivateIp:
-    Value: !Sub ${ApacheServer.PrivateIp}
-    Description: connect via SSH from bastion host
+    Description: 'Public Name of Bastion Host to connect via SSH as user ec2-user.'
+  VarnishProxyPublicName:
+    Value: !Sub ${VarnishProxy.PublicDnsName}
+    Description: 'Public Name of Varnish Proxy handling incoming HTTP requests.'
+  VarnishProxyPrivateIp:
+    Value: !Sub ${VarnishProxy.PrivateIp}
+    Description: 'Private IP of Varnish Proxy to connect via SSH from Bastion Host.'
+  ApacheWebserverPrivateIp:
+    Value: !Sub ${ApacheWebserver.PrivateIp}
+    Description: 'Private IP of Apache Webserver to connect via SSH from Bastion Host.'
