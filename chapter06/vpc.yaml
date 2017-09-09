@@ -54,7 +54,7 @@ Resources:
         CidrIp: '0.0.0.0/0'
       Tags:
       - Key: Name
-        Value: default
+        Value: 'AWS in Action: chapter 6 (VPC)'
   VPC:
     Type: 'AWS::EC2::VPC'
     Properties:
