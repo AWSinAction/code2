@@ -521,7 +521,7 @@ Resources:
           EOF
           sed -i.bak "s/^VARNISH_LISTEN_PORT=.*/VARNISH_LISTEN_PORT=80/" /etc/sysconfig/varnish
           service varnish start
-          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region} 
+          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region}
       Tags:
       - Key: Name
         Value: 'Varnish Proxy'
@@ -547,7 +547,7 @@ Resources:
           #!/bin/bash -ex
           yum -y install httpd
           service httpd start
-          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region} 
+          /opt/aws/bin/cfn-signal --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region}
       Tags:
       - Key: Name
         Value: 'Apache Webserver'

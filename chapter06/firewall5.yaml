@@ -53,7 +53,7 @@ Resources:
     Properties:
       GroupDescription: 'Allowing incoming SSH and ICPM from anywhere.'
       VpcId: !Ref VPC
-      SecurityGroupIngress: 
+      SecurityGroupIngress:
       - IpProtocol: icmp
         FromPort: "-1"
         ToPort: "-1"
