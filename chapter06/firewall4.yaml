@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS in Action: chapter 6 (firewall 2)'
+Description: 'AWS in Action: chapter 6 (firewall 4)'
 Parameters:
   KeyName:
     Description: 'Key Pair name'
