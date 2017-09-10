@@ -13,8 +13,10 @@ Parameters:
     Description: 'Just select one of the available subnets'
     Type: 'AWS::EC2::Subnet::Id'
   IpForSSH:
-    Description: Your public IP address to allow SSH access
+    Description: 'Your public IP address to allow SSH access'
     Type: String
+    AllowedPattern: '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+    ConstraintDescription: 'Enter a valid IPv4 address'
 Mappings:
   RegionMap:
     'ap-south-1':
