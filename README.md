@@ -1,15 +1,15 @@
-# Amazon Web Services in Action
+# Amazon Web Services in Action, Second Edition
 
-![Cover of Amazon Web Services in Action](http://manning.com/wittig/wittig_cover150.jpg)
+![Cover of Amazon Web Services in Action, Second Edition](https://images.manning.com/720/960/resize/book/2/2e8abe8-aa59-434f-bbbe-57e4cac9e09f/Wittig-Amazon-2ed-MEAP-HI.png)
 
-Code of Amazon Web Services in Action http://manning.com/wittig?a_aid=mwittig&amp;a_bid=cc17df85
+Code of Amazon Web Services in Action, Second Edition https://www.manning.com/books/amazon-web-services-in-action-second-edition?a_aid=mwittig&amp;a_bid=cc17df85
 
 ## About the book
 
-Distributed systems are unpredictable, and it can be an enormous (and expensive!) challenge to manage around potentially-crippling obstacles like hardware failures, unanticipated changes in load, network issues, or the need to rapidly scale or reconfigure your infrastructure. Amazon Web Services is a platform for hosting distributed applications in a secure, flexible cloud environment. AWS provides a suite of services designed to help you focus on what your application does instead of the infrastructure required to run it. Whether you're serving up blog pages, analyzing fast data in real-time, building software as a service, or implementing a massive e-commerce site, AWS provides both a stable platform and services that will scale with your application.
+Amazon Web Services in Action, Second Edition is a comprehensive introduction to computing, storing, and networking in the AWS cloud. You'll find clear, relevant coverage of all the essential AWS services you to know, emphasizing best practices for security, high availability and scalability. The practical, hands-on examples include different approaches to deploying applications on AWS, how to secure your infrastructure by isolating networks, and controlling traffic and managing access to AWS resources. You'll also learn to integrate AWS services into your own applications using SDKs and gain handy ideas on how to design applications for high availability, fault tolerance, and scalability.
 
-Amazon Web Services in Action introduces you to computing, storing and networking in the AWS cloud. You'll start with a broad overview of AWS and learn how to spin up servers manually and from the command line. Then, you'll explore infrastructure automation with the AWS CloudFormation service, where you can describe a blueprint of your infrastructure as code. As you progress through the book, you will learn how to isolate your systems using private networks to increase security and how to use the most valuable AWS managed services available on AWS. You'll also discover the benefits of stateless servers. In the end, you'll look at the AWS model for high availability, scaling, decoupling with queues and load balancers, and fault tolerance.
+Fully updated to include the latest revisions and updates to AWS; this new edition also offers three new chapters covering the latest additions to the AWS platform: serverless infrastructure automation with AWS Lambda, sharing data volumes between machines with EFS, and caching data in memory with ElastiCache!
 
 ## About the authors
 
-Andreas and Michael Wittig work as software engineers and consultants focusing on AWS, web and mobile application development. They work with clients all around the globe. Together, they migrated the complete IT infrastructure of the first Bank in Germany to AWS. They have expertise in distributed system development and architecture, algorithmic trading and real-time analytics. Andreas and Michael are proponents of the DevOps model. They are both AWS Certified Solutions Architects – Professional Level.
+Andreas Wittig and Michael Wittig are software engineers and consultants focused on AWS and web development. They migrated the first bank in Germany to AWS along with other heavily regulated businesses with legacy applications.
