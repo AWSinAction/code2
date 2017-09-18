@@ -2,7 +2,7 @@
 
 ![Cover of Amazon Web Services in Action, Second Edition](https://images.manning.com/720/960/resize/book/2/2e8abe8-aa59-434f-bbbe-57e4cac9e09f/Wittig-Amazon-2ed-MEAP-HI.png)
 
-Code of Amazon Web Services in Action, Second Edition https://www.manning.com/books/amazon-web-services-in-action-second-edition?a_aid=mwittig&amp;a_bid=cc17df85
+Code of [Amazon Web Services in Action, Second Edition](https://www.manning.com/books/amazon-web-services-in-action-second-edition?a_aid=mwittig&a_bid=cc17df85)
 
 ## About the book
 
