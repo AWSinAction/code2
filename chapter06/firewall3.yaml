@@ -1,0 +1,80 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS in Action: chapter 6 (firewall 3)'
+Parameters:
+  KeyName:
+    Description: 'Key Pair name'
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: mykey
+  VPC:
+    Description: 'Just select the one and only default VPC'
+    Type: 'AWS::EC2::VPC::Id'
+  Subnet:
+    Description: 'Just select one of the available subnets'
+    Type: 'AWS::EC2::Subnet::Id'
+Mappings:
+  RegionMap:
+    'ap-south-1':
+      AMI: 'ami-d7abd1b8'
+    'eu-west-2':
+      AMI: 'ami-489f8e2c'
+    'eu-west-1':
+      AMI: 'ami-ebd02392'
+    'ap-northeast-2':
+      AMI: 'ami-8663bae8'
+    'ap-northeast-1':
+      AMI: 'ami-4af5022c'
+    'sa-east-1':
+      AMI: 'ami-d27203be'
+    'ca-central-1':
+      AMI: 'ami-5ac17f3e'
+    'ap-southeast-1':
+      AMI: 'ami-fdb8229e'
+    'ap-southeast-2':
+      AMI: 'ami-30041c53'
+    'eu-central-1':
+      AMI: 'ami-657bd20a'
+    'us-east-1':
+      AMI: 'ami-4fffc834'
+    'us-east-2':
+      AMI: 'ami-ea87a78f'
+    'us-west-1':
+      AMI: 'ami-3a674d5a'
+    'us-west-2':
+      AMI: 'ami-aa5ebdd2'
+Resources:
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Learn how to protect your EC2 Instance.'
+      VpcId: !Ref VPC
+      Tags:
+      - Key: Name
+        Value: 'AWS in Action: chapter 6 (firewall)'
+      # allowing inbound ICMP traffic
+      SecurityGroupIngress:
+      - IpProtocol: icmp
+        FromPort: '-1'
+        ToPort: '-1'
+        CidrIp: '0.0.0.0/0'
+      # allowing inbound SSH traffic
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: '0.0.0.0/0'
+  Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceType: 't2.micro'
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+      - !Ref SecurityGroup
+      SubnetId: !Ref Subnet
+      Tags:
+      - Key: Name
+        Value: 'AWS in Action: chapter 6 (firewall)'
+Outputs:
+  PublicName:
+    Value: !Sub ${Instance.PublicDnsName}
+    Description: 'Public name of EC2 Instance (connect via SSH as user ec2-user)'

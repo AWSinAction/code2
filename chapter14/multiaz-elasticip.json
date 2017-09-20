@@ -350,7 +350,6 @@
 						}
 					]
 				},
-				"Path": "/",
 				"Policies": [
 					{
 						"PolicyName": "root",
@@ -371,7 +370,6 @@
 		"IamInstanceProfile": {
 			"Type": "AWS::IAM::InstanceProfile",
 			"Properties": {
-				"Path": "/",
 				"Roles": [{"Ref": "IamRole"}]
 			}
 		},

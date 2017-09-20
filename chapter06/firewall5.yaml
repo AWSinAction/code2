@@ -1,0 +1,126 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS in Action: chapter 6 (firewall 5)'
+Parameters:
+  KeyName:
+    Description: 'Key Pair name'
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: mykey
+  VPC:
+    Description: 'Just select the one and only default VPC'
+    Type: 'AWS::EC2::VPC::Id'
+  Subnet:
+    Description: 'Just select one of the available subnets'
+    Type: 'AWS::EC2::Subnet::Id'
+  IpForSSH:
+    Description: 'Your public IP address to allow SSH access'
+    Type: String
+    AllowedPattern: '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+    ConstraintDescription: 'Enter a valid IPv4 address'
+Mappings:
+  RegionMap:
+    'ap-south-1':
+      AMI: 'ami-d7abd1b8'
+    'eu-west-2':
+      AMI: 'ami-489f8e2c'
+    'eu-west-1':
+      AMI: 'ami-ebd02392'
+    'ap-northeast-2':
+      AMI: 'ami-8663bae8'
+    'ap-northeast-1':
+      AMI: 'ami-4af5022c'
+    'sa-east-1':
+      AMI: 'ami-d27203be'
+    'ca-central-1':
+      AMI: 'ami-5ac17f3e'
+    'ap-southeast-1':
+      AMI: 'ami-fdb8229e'
+    'ap-southeast-2':
+      AMI: 'ami-30041c53'
+    'eu-central-1':
+      AMI: 'ami-657bd20a'
+    'us-east-1':
+      AMI: 'ami-4fffc834'
+    'us-east-2':
+      AMI: 'ami-ea87a78f'
+    'us-west-1':
+      AMI: 'ami-3a674d5a'
+    'us-west-2':
+      AMI: 'ami-aa5ebdd2'
+Resources:
+  SecurityGroupBastionHost:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allowing incoming SSH and ICPM from anywhere.'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: icmp
+        FromPort: "-1"
+        ToPort: "-1"
+        CidrIp: '0.0.0.0/0'
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: !Sub '${IpForSSH}/32'
+      Tags:
+      - Key: Name
+        Value: 'Bastion Host'
+  SecurityGroupInstance:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allowing incoming SSH from the Bastion Host.'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        SourceSecurityGroupId: !Ref SecurityGroupBastionHost
+      Tags:
+      - Key: Name
+        Value: 'Instance'
+  BastionHost:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceType: 't2.micro'
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+      - !Ref SecurityGroupBastionHost
+      SubnetId: !Ref Subnet
+      Tags:
+      - Key: Name
+        Value: 'Bastion Host'
+  Instance1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceType: 't2.micro'
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+      - !Ref SecurityGroupInstance
+      SubnetId: !Ref Subnet
+      Tags:
+      - Key: Name
+        Value: 'Instance 1'
+  Instance2:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceType: 't2.micro'
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+      - !Ref SecurityGroupInstance
+      SubnetId: !Ref Subnet
+      Tags:
+      - Key: Name
+        Value: 'Instance 2'
+Outputs:
+  BastionHostPublicName:
+    Value: !Sub ${BastionHost.PublicDnsName}
+    Description: 'Bastion host public name (connect via SSH as user ec2-user)'
+  Instance1PublicName:
+    Value: !Sub ${Instance1.PublicDnsName}
+    Description: 'Instance1 public name'
+  Instance2PublicName:
+    Value: !Sub ${Instance2.PublicDnsName}
+    Description: 'Instance2 public name'
