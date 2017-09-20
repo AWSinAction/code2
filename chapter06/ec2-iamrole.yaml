@@ -65,7 +65,6 @@ Resources:
   InstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      Path: '/'
       Roles:
       - !Ref Role
   Role:
@@ -80,7 +79,6 @@ Resources:
             - 'ec2.amazonaws.com'
           Action:
           - 'sts:AssumeRole'
-      Path: '/'
       Policies:
       - PolicyName: ec2
         PolicyDocument:
@@ -108,7 +106,7 @@ Resources:
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash -ex
-          INSTANCEID=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
+          INSTANCEID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
           echo "aws ec2 stop-instances --instance-ids $INSTANCEID --region ${AWS::Region}" | at now + ${Lifetime} minutes
       Tags:
       - Key: Name

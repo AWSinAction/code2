@@ -69,7 +69,7 @@ Resources:
       - Key: Name
         Value: 'AWS in Action: chapter 6 (yum update)'
       UserData:
-        'Fn::Base64': !Sub |
+        'Fn::Base64': |
           #!/bin/bash -ex
           yum -y update
 Outputs:
