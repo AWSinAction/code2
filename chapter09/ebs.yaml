@@ -1,0 +1,130 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS in Action: chapter 9 (EBS)'
+Parameters:
+  KeyName:
+    Description: Key Pair name
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: mykey
+  VPC:
+    Description: 'Just select the one and only default VPC'
+    Type: 'AWS::EC2::VPC::Id'
+  Subnet:
+    Description: 'Just select one of the available subnets'
+    Type: 'AWS::EC2::Subnet::Id'
+  AttachVolume:
+    Description: 'Should the volume be attached?'
+    Type: String
+    Default: 'yes'
+    AllowedValues:
+    - 'yes'
+    - 'no'
+Mappings:
+  RegionMap:
+    'ap-south-1':
+      AMI: 'ami-d7abd1b8'
+    'eu-west-2':
+      AMI: 'ami-489f8e2c'
+    'eu-west-1':
+      AMI: 'ami-ebd02392'
+    'ap-northeast-2':
+      AMI: 'ami-8663bae8'
+    'ap-northeast-1':
+      AMI: 'ami-4af5022c'
+    'sa-east-1':
+      AMI: 'ami-d27203be'
+    'ca-central-1':
+      AMI: 'ami-5ac17f3e'
+    'ap-southeast-1':
+      AMI: 'ami-fdb8229e'
+    'ap-southeast-2':
+      AMI: 'ami-30041c53'
+    'eu-central-1':
+      AMI: 'ami-657bd20a'
+    'us-east-1':
+      AMI: 'ami-4fffc834'
+    'us-east-2':
+      AMI: 'ami-ea87a78f'
+    'us-west-1':
+      AMI: 'ami-3a674d5a'
+    'us-west-2':
+      AMI: 'ami-aa5ebdd2'
+Conditions:
+  Attached: !Equals [!Ref AttachVolume, 'yes']
+Resources:
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow incoming SSH from anywhere'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+      - CidrIp: '0.0.0.0/0'
+        FromPort: 22
+        ToPort: 22
+        IpProtocol: tcp
+      Tags:
+      - Key: Name
+        Value: 'AWS in Action: chapter 9 (EBS)'
+  IamRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 'ec2.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: ec2
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'ec2:DescribeVolumes'
+            - 'ec2:CreateSnapshot'
+            - 'ec2:DescribeSnapshots'
+            - 'ec2:DeleteSnapshot'
+            Resource: '*'
+  IamInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref IamRole
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      IamInstanceProfile: !Ref IamInstanceProfile
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceType: 't2.micro'
+      KeyName: !Ref KeyName
+      SecurityGroupIds:
+      - !Ref SecurityGroup
+      SubnetId: !Ref Subnet
+      Tags:
+      - Key: Name
+        Value: 'AWS in Action: chapter 9 (EBS)'
+  Volume:
+    Type: 'AWS::EC2::Volume'
+    Properties:
+      AvailabilityZone: !Sub ${EC2Instance.AvailabilityZone}
+      Size: 5
+      VolumeType: gp2
+      Tags:
+      - Key: Name
+        Value: 'AWS in Action: chapter 9 (EBS)'
+  VolumeAttachment:
+    Type: 'AWS::EC2::VolumeAttachment'
+    Condition: Attached
+    Properties:
+      Device: '/dev/xvdf'
+      InstanceId: !Ref EC2Instance
+      VolumeId: !Ref Volume
+Outputs:
+  PublicName:
+    Value: !Sub ${EC2Instance.PublicDnsName}
+    Description: 'Public name (connect via SSH as user ec2-user)'
+  VolumeId:
+    Value: !Ref Volume
+    Description: 'ID of the EBS volume'
