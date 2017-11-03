@@ -148,6 +148,7 @@ if (input['user-add'] === true) {
     }
   });
 } else if (input['task-ls'] === true) {
+  const yyyymmdd = moment().format('YYYYMMDD');
   const params = {
     KeyConditionExpression: 'uid = :uid',
     ExpressionAttributeValues: {
@@ -162,15 +163,15 @@ if (input['user-add'] === true) {
   }
   if (input['--overdue'] === true) {
     params.FilterExpression = 'due < :yyyymmdd';
-    params.ExpressionAttributeValues[':yyyymmdd'] = {N: moment().format('YYYYMMDD')};
+    params.ExpressionAttributeValues[':yyyymmdd'] = {N: yyyymmdd};
   } else if (input['--due'] === true) {
     params.FilterExpression = 'due = :yyyymmdd';
-    params.ExpressionAttributeValues[':yyyymmdd'] = {N: moment().format('YYYYMMDD')};
+    params.ExpressionAttributeValues[':yyyymmdd'] = {N: yyyymmdd};
   } else if (input['--withoutdue'] === true) {
     params.FilterExpression = 'attribute_not_exists(due)';
   } else if (input['--futuredue'] === true) {
     params.FilterExpression = 'due > :yyyymmdd';
-    params.ExpressionAttributeValues[':yyyymmdd'] = {N: moment().format('YYYYMMDD')};
+    params.ExpressionAttributeValues[':yyyymmdd'] = {N: yyyymmdd};
   } else if (input['--dueafter'] !== null) {
     params.FilterExpression = 'due > :yyyymmdd';
     params.ExpressionAttributeValues[':yyyymmdd'] = {N: input['--dueafter']};
@@ -198,6 +199,7 @@ if (input['user-add'] === true) {
     }
   });
 } else if (input['task-la'] === true) {
+  const yyyymmdd = moment().format('YYYYMMDD');
   const params = {
     KeyConditionExpression: 'category = :category',
     ExpressionAttributeValues: {
@@ -213,15 +215,15 @@ if (input['user-add'] === true) {
   }
   if (input['--overdue'] === true) {
     params.FilterExpression = 'due < :yyyymmdd';
-    params.ExpressionAttributeValues[':yyyymmdd'] = {N: moment().format('YYYYMMDD')};
+    params.ExpressionAttributeValues[':yyyymmdd'] = {N: yyyymmdd};
   } else if (input['--due'] === true) {
     params.FilterExpression = 'due = :yyyymmdd';
-    params.ExpressionAttributeValues[':yyyymmdd'] = {N: moment().format('YYYYMMDD')};
+    params.ExpressionAttributeValues[':yyyymmdd'] = {N: yyyymmdd};
   } else if (input['--withoutdue'] === true) {
     params.FilterExpression = 'attribute_not_exists(due)';
   } else if (input['--futuredue'] === true) {
     params.FilterExpression = 'due > :yyyymmdd';
-    params.ExpressionAttributeValues[':yyyymmdd'] = {N: moment().format('YYYYMMDD')};
+    params.ExpressionAttributeValues[':yyyymmdd'] = {N: yyyymmdd};
   } else if (input['--dueafter'] !== null) {
     params.FilterExpression = 'due > :yyyymmdd';
     params.ExpressionAttributeValues[':yyyymmdd'] = {N: input['--dueafter']};
@@ -240,6 +242,7 @@ if (input['user-add'] === true) {
     }
   });
 } else if (input['task-done'] === true) {
+  const yyyymmdd = moment().format('YYYYMMDD');
   const params = {
     Key: {
       uid: {S: input['<uid>']},
@@ -247,7 +250,7 @@ if (input['user-add'] === true) {
     },
     UpdateExpression: 'SET completed = :yyyymmdd',
     ExpressionAttributeValues: {
-      ':yyyymmdd': {N: moment().format('YYYYMMDD')}
+      ':yyyymmdd': {N: yyyymmdd}
     },
     TableName: 'todo-task'
   };
