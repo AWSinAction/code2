@@ -7,3 +7,5 @@ rules:
     max: 999
   comments:
     min-spaces-from-content: 1
+ignore: |
+  node_modules/
