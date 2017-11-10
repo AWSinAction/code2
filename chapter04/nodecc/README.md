@@ -4,8 +4,12 @@
 
 Install the dependencies ...
 
-	npm install
+```
+npm install
+```
 
 ... and run nodecc
 
-	node index.js
+```
+node index.js
+```

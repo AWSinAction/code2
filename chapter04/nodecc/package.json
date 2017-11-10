@@ -1,8 +1,14 @@
 {
-	"dependencies": {
-		"aws-sdk": "2.95.0",
-		"blessed": "0.1.81",
-		"jmespath": "0.15.0"
-	},
-	"private": true
+  "dependencies": {
+    "aws-sdk": "2.95.0",
+    "blessed": "0.1.81",
+    "jmespath": "0.15.0"
+  },
+  "devDependencies": {
+    "eslint": "4.10.0"
+  },
+  "scripts": {
+    "test": "eslint ."
+  },
+  "private": true
 }
