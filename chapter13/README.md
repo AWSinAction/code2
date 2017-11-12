@@ -84,6 +84,8 @@ node index.js task-done michael 1432187491647
 
 ## schema
 
+You can use the `tables.yaml` CloudFormation template to create the DynamoDB tables, or the CLI:
+
 ### user
 
 ```
