@@ -25,5 +25,5 @@ Resources:
               source:
               - 'aws.ec2'
               detail:
-                eventSource:
-                - 'ec2.amazonaws.com'
+                eventName:
+                - 'RunInstances'
