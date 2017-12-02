@@ -202,10 +202,6 @@ Resources:
             wget -q -T 60 https://pkg.jenkins.io/redhat/jenkins-1.616-1.1.noarch.rpm
             rpm --install jenkins-1.616-1.1.noarch.rpm
 
-            # configure Jenkins
-            sed -i -e 's/JENKINS_ARGS=""/JENKINS_ARGS="--argumentsRealm.passwd.admin=${JenkinsAdminPassword} --argumentsRealm.roles.admin=admin"/g' /etc/sysconfig/jenkins
-            echo '<?xml version="1.0" encoding="UTF-8"?><hudson><version>1.0</version><useSecurity>true</useSecurity><authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/><securityRealm class="hudson.security.LegacySecurityRealm"/></hudson>' > /var/lib/jenkins/config.xml
-
             # wait until EFS file system is available
             while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
             sleep 10
@@ -213,6 +209,14 @@ Resources:
             # mount EFS file system
             echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /var/lib/jenkins nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
             mount -a
+            chown jenkins:jenkins /var/lib/jenkins/
+
+            # configure Jenkins
+            sed -i -e 's/JENKINS_ARGS=""/JENKINS_ARGS="--argumentsRealm.passwd.admin=${JenkinsAdminPassword} --argumentsRealm.roles.admin=admin"/g' /etc/sysconfig/jenkins
+            if [ ! -f /var/lib/jenkins/config.xml ]; then
+              echo '<?xml version="1.0" encoding="UTF-8"?><hudson><version>1.0</version><useSecurity>true</useSecurity><authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/><securityRealm class="hudson.security.LegacySecurityRealm"/></hudson>' > /var/lib/jenkins/config.xml
+              chown jenkins:jenkins /var/lib/jenkins/config.xml
+            fi
 
             # start jenkins
             service jenkins start
@@ -245,4 +249,3 @@ Outputs:
   Password:
     Description: 'Password for Jenkins administrator user.'
     Value: !Ref JenkinsAdminPassword
-
