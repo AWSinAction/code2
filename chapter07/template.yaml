@@ -10,20 +10,20 @@ Resources:
       Runtime: python3.6
       CodeUri: './lambda_function.py'
       Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action: 'ec2:CreateTags'
-              Resource: '*'
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: 'ec2:CreateTags'
+          Resource: '*'
       Events:
         CloudTrail:
           Type: CloudWatchEvent
           Properties:
             Pattern:
               detail-type:
-                - 'AWS API Call via CloudTrail'
+              - 'AWS API Call via CloudTrail'
               source:
-                - 'aws.ec2'
+              - 'aws.ec2'
               detail:
                 eventName:
-                  - 'RunInstances'
+                - 'RunInstances'
