@@ -203,7 +203,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
       - Key: Name
-        Value: 'jenkins-multiaz-efs-elasticip'
+        Value: 'jenkins-multiaz-efs-eip'
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
@@ -266,7 +266,7 @@ Resources:
       LaunchConfigurationName: !Ref LaunchConfiguration
       Tags:
       - Key: Name
-        Value: 'jenkins-multiaz-efs-elasticip'
+        Value: 'jenkins-multiaz-efs-eip'
         PropagateAtLaunch: true
       DesiredCapacity: 1
       MinSize: 1
