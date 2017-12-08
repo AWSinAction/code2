@@ -192,7 +192,7 @@ Resources:
       AlarmDescription: 'Recover EC2 instance when underlying hardware fails.'
       Namespace: 'AWS/EC2'
       MetricName: 'StatusCheckFailed_System'
-      Statistic: Minimum
+      Statistic: Maximum
       Period: 60
       EvaluationPeriods: 5
       ComparisonOperator: GreaterThanThreshold
