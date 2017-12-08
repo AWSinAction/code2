@@ -225,7 +225,7 @@
 					"yum update -y aws-cfn-bootstrap\n",
 					"curl -sL https://rpm.nodesource.com/setup | bash -\n",
 					"yum install -y nodejs\n",
-					"wget https://github.com/AWSinAction/code2/archive/master.zip\n",
+					"wget -q -T 60 https://github.com/AWSinAction/code2/archive/master.zip\n",
 					"unzip master.zip\n",
 					"cd code2-master/chapter15/url2png/\n",
 					"npm install\n",
