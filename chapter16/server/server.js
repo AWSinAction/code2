@@ -1,19 +1,19 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var AWS = require('aws-sdk');
-var uuid = require('node-uuid');
+var uuidv4 = require('uuid/v4');
 var multiparty = require('multiparty');
 
 var lib = require('./lib.js');
 
 var db = new AWS.DynamoDB({
-  "region": "us-east-1"
+  'region': 'us-east-1'
 });
 var sqs = new AWS.SQS({
-  "region": "us-east-1"
+  'region': 'us-east-1'
 });
 var s3 = new AWS.S3({
-  "region": "us-east-1"
+  'region': 'us-east-1'
 });
 
 var app = express();
@@ -22,12 +22,12 @@ app.use(express.static('public'));
 
 function getImage(id, cb) {
   db.getItem({
-    "Key": {
-      "id": {
-        "S": id
+    'Key': {
+      'id': {
+        'S': id
       }
     },
-    "TableName": "imagery-image"
+    'TableName': 'imagery-image'
   }, function(err, data) {
     if (err) {
       cb(err);
@@ -35,7 +35,7 @@ function getImage(id, cb) {
       if (data.Item) {
         cb(null, lib.mapImage(data.Item));
       } else {
-        cb(new Error("image not found"));
+        cb(new Error('image not found'));
       }
     }
   });
@@ -44,54 +44,54 @@ function getImage(id, cb) {
 function uploadImage(image, part, response) {
   var rawS3Key = 'upload/' + image.id + '-' + Date.now();
   s3.putObject({
-    "Bucket": process.env.ImageBucket,
-    "Key": rawS3Key,
-    "Body": part,
-    "ContentLength": part.byteCount
+    'Bucket': process.env.ImageBucket,
+    'Key': rawS3Key,
+    'Body': part,
+    'ContentLength': part.byteCount
   }, function(err, data) {
     if (err) {
       throw err;
     } else {
       db.updateItem({
-        "Key": {
-          "id": {
-            "S": image.id
+        'Key': {
+          'id': {
+            'S': image.id
           }
         },
-        "UpdateExpression": "SET #s=:newState, version=:newVersion, rawS3Key=:rawS3Key",
-        "ConditionExpression": "attribute_exists(id) AND version=:oldVersion AND #s IN (:stateCreated, :stateUploaded)",
-        "ExpressionAttributeNames": {
-          "#s": "state"
+        'UpdateExpression': 'SET #s=:newState, version=:newVersion, rawS3Key=:rawS3Key',
+        'ConditionExpression': 'attribute_exists(id) AND version=:oldVersion AND #s IN (:stateCreated, :stateUploaded)',
+        'ExpressionAttributeNames': {
+          '#s': 'state'
         },
-        "ExpressionAttributeValues": {
-          ":newState": {
-            "S": "uploaded"
+        'ExpressionAttributeValues': {
+          ':newState': {
+            'S': 'uploaded'
           },
-          ":oldVersion": {
-            "N": image.version.toString()
+          ':oldVersion': {
+            'N': image.version.toString()
           },
-          ":newVersion": {
-            "N": (image.version + 1).toString()
+          ':newVersion': {
+            'N': (image.version + 1).toString()
           },
-          ":rawS3Key": {
-            "S": rawS3Key
+          ':rawS3Key': {
+            'S': rawS3Key
           },
-          ":stateCreated": {
-            "S": "created"
+          ':stateCreated': {
+            'S': 'created'
           },
-          ":stateUploaded": {
-            "S": "uploaded"
+          ':stateUploaded': {
+            'S': 'uploaded'
           }
         },
-        "ReturnValues": "ALL_NEW",
-        "TableName": "imagery-image"
+        'ReturnValues': 'ALL_NEW',
+        'TableName': 'imagery-image'
       }, function(err, data) {
         if (err) {
            throw err;
         } else {
           sqs.sendMessage({
-            "MessageBody": JSON.stringify({"imageId": image.id, "desiredState": "processed"}),
-            "QueueUrl": process.env.ImageQueue,
+            'MessageBody': JSON.stringify({'imageId': image.id, 'desiredState': 'processed'}),
+            'QueueUrl': process.env.ImageQueue,
           }, function(err) {
             if (err) {
               throw err;
@@ -108,29 +108,29 @@ function uploadImage(image, part, response) {
 }
 
 app.post('/image', function(request, response) {
-  var id = uuid.v4();
+  var id = uuidv4();
   db.putItem({
-    "Item": {
-      "id": {
-        "S": id
+    'Item': {
+      'id': {
+        'S': id
       },
-      "version": {
-        "N": "0"
+      'version': {
+        'N': '0'
       },
-      "created": {
-        "N": Date.now().toString()
+      'created': {
+        'N': Date.now().toString()
       },
-      "state": {
-        "S": "created"
+      'state': {
+        'S': 'created'
       }
     },
-    "TableName": "imagery-image",
-    "ConditionExpression": "attribute_not_exists(id)"
+    'TableName': 'imagery-image',
+    'ConditionExpression': 'attribute_not_exists(id)'
   }, function(err, data) {
     if (err) {
       throw err;
     } else {
-      response.json({"id": id, "state": "created"});
+      response.json({'id': id, 'state': 'created'});
     }
   });
 });
@@ -160,5 +160,5 @@ app.post('/image/:id/upload', function(request, response) {
 });
 
 app.listen(process.env.PORT || 8080, function() {
-  console.log("Server started. Open http://localhost:" + (process.env.PORT || 8080) + " with browser.");
+  console.log('Server started. Open http://localhost:' + (process.env.PORT || 8080) + ' with browser.');
 });
