@@ -8,10 +8,10 @@ var fs = require('fs');
 var lib = require('./lib.js');
 
 var db = new AWS.DynamoDB({
-  "region": "us-east-1"
+  'region': 'us-east-1'
 });
 var s3 = new AWS.S3({
-  "region": "us-east-1"
+  'region': 'us-east-1'
 });
 
 var app = express();
@@ -19,12 +19,12 @@ app.use(bodyParser.json());
 
 function getImage(id, cb) {
   db.getItem({
-    "Key": {
-      "id": {
-        "S": id
+    'Key': {
+      'id': {
+        'S': id
       }
     },
-    "TableName": "imagery-image"
+    'TableName': 'imagery-image'
   }, function(err, data) {
     if (err) {
       cb(err);
@@ -32,7 +32,7 @@ function getImage(id, cb) {
       if (data.Item) {
         cb(null, lib.mapImage(data.Item));
       } else {
-        cb(new Error("image not found"));
+        cb(new Error('image not found'));
       }
     }
   });
@@ -43,8 +43,8 @@ app.get('/', function(request, response) {
 });
 
 app.post('/sqs', function(request, response) {
-  assert.string(request.body.imageId, "imageId");
-  assert.string(request.body.desiredState, "desiredState");
+  assert.string(request.body.imageId, 'imageId');
+  assert.string(request.body.desiredState, 'desiredState');
   getImage(request.body.imageId, function(err, image) {
     if (err) {
       throw err;
@@ -52,14 +52,14 @@ app.post('/sqs', function(request, response) {
       if (typeof states[request.body.desiredState] === 'function') {
         states[request.body.desiredState](image, request, response);
       } else {
-        throw new Error("unsupported desiredState");
+        throw new Error('unsupported desiredState');
       }
     }
   });
 });
 
 var states = {
-  "processed": processed
+  'processed': processed
 };
 
 function processImage(image, cb) {
@@ -67,13 +67,13 @@ function processImage(image, cb) {
   var rawFile = './tmp_raw_' + image.id;
   var processedFile = './tmp_processed_' + image.id;
   s3.getObject({
-    "Bucket": process.env.ImageBucket,
-    "Key": image.rawS3Key
+    'Bucket': process.env.ImageBucket,
+    'Key': image.rawS3Key
   }, function(err, data) {
     if (err) {
       cb(err);
     } else {
-      fs.writeFile(rawFile, data.Body, {"encoding": null}, function(err) {
+      fs.writeFile(rawFile, data.Body, {'encoding': null}, function(err) {
         if (err) {
           cb(err);
         } else {
@@ -85,18 +85,18 @@ function processImage(image, cb) {
             this.render(function() {
               this.save(processedFile);
               fs.unlink(rawFile, function() {
-                fs.readFile(processedFile, {"encoding": null}, function(err, buf) {
+                fs.readFile(processedFile, {'encoding': null}, function(err, buf) {
                   if (err) {
                     cb(err);
                   } else {
                     s3.putObject({
-                      "Bucket": process.env.ImageBucket,
-                      "Key": processedS3Key,
-                      "ACL": "public-read",
-                      "Body": buf,
-                      "ContentType": "image/png"
+                      'Bucket': process.env.ImageBucket,
+                      'Key': processedS3Key,
+                      'ACL': 'public-read',
+                      'Body': buf,
+                      'ContentType': 'image/png'
                     }, function(err) {
-                      console.log("s3.putObject", err); // TODO debug only
+                      console.log('s3.putObject', err); // TODO debug only
                       if (err) {
                         cb(err);
                       } else {
@@ -122,38 +122,38 @@ function processed(image, request, response) {
       throw err;
     } else {
       db.updateItem({
-        "Key": {
-          "id": {
-            "S": image.id
+        'Key': {
+          'id': {
+            'S': image.id
           }
         },
-        "UpdateExpression": "SET #s=:newState, version=:newVersion, processedS3Key=:processedS3Key",
-        "ConditionExpression": "attribute_exists(id) AND version=:oldVersion AND #s IN (:stateUploaded, :stateProcessed)",
-        "ExpressionAttributeNames": {
-          "#s": "state"
+        'UpdateExpression': 'SET #s=:newState, version=:newVersion, processedS3Key=:processedS3Key',
+        'ConditionExpression': 'attribute_exists(id) AND version=:oldVersion AND #s IN (:stateUploaded, :stateProcessed)',
+        'ExpressionAttributeNames': {
+          '#s': 'state'
         },
-        "ExpressionAttributeValues": {
-          ":newState": {
-            "S": "processed"
+        'ExpressionAttributeValues': {
+          ':newState': {
+            'S': 'processed'
           },
-          ":oldVersion": {
-            "N": image.version.toString()
+          ':oldVersion': {
+            'N': image.version.toString()
           },
-          ":newVersion": {
-            "N": (image.version + 1).toString()
+          ':newVersion': {
+            'N': (image.version + 1).toString()
           },
-          ":processedS3Key": {
-            "S": processedS3Key
+          ':processedS3Key': {
+            'S': processedS3Key
           },
-          ":stateUploaded": {
-            "S": "uploaded"
+          ':stateUploaded': {
+            'S': 'uploaded'
           },
-          ":stateProcessed": {
-            "S": "processed"
+          ':stateProcessed': {
+            'S': 'processed'
           }
         },
-        "ReturnValues": "ALL_NEW",
-        "TableName": "imagery-image"
+        'ReturnValues': 'ALL_NEW',
+        'TableName': 'imagery-image'
       }, function(err, data) {
         if (err) {
           throw err;
@@ -166,5 +166,5 @@ function processed(image, request, response) {
 }
 
 app.listen(process.env.PORT || 8080, function() {
-  console.log("Worker started on port " + (process.env.PORT || 8080));
+  console.log('Worker started on port ' + (process.env.PORT || 8080));
 });
