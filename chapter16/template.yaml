@@ -109,7 +109,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
     Properties:
       ApplicationName: !Ref EBWorkerApplication
-      Description: 'Imagery worker: AWS in Action: chapter 13'
+      Description: 'Imagery worker: AWS in Action: chapter 16'
       SolutionStackName: '64bit Amazon Linux 2017.09 v4.4.0 running Node.js'
       OptionSettings:
       - Namespace: 'aws:autoscaling:launchconfiguration'
@@ -137,7 +137,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::Environment'
     Properties:
       ApplicationName: !Ref EBWorkerApplication
-      Description: 'Imagery worker: AWS in Action: chapter 13'
+      Description: 'Imagery worker: AWS in Action: chapter 16'
       TemplateName: !Ref EBWorkerConfigurationTemplate
       VersionLabel: !Ref EBWorkerApplicationVersion
       Tier:
@@ -148,12 +148,12 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::Application'
     Properties:
       ApplicationName: 'imagery-worker'
-      Description: 'Imagery worker: AWS in Action: chapter 13'
+      Description: 'Imagery worker: AWS in Action: chapter 16'
   EBWorkerApplicationVersion:
     Type: 'AWS::ElasticBeanstalk::ApplicationVersion'
     Properties:
       ApplicationName: !Ref EBWorkerApplication
-      Description: 'Imagery worker: AWS in Action: chapter 13'
+      Description: 'Imagery worker: AWS in Action: chapter 16'
       SourceBundle:
         S3Bucket: 'awsinaction-code2'
         S3Key: 'chapter16/build/worker.zip'
@@ -222,7 +222,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
     Properties:
       ApplicationName: !Ref EBServerApplication
-      Description: 'Imagery server: AWS in Action: chapter 13'
+      Description: 'Imagery server: AWS in Action: chapter 16'
       SolutionStackName: '64bit Amazon Linux 2017.09 v4.4.0 running Node.js'
       OptionSettings:
       - Namespace: 'aws:autoscaling:asg'
@@ -250,19 +250,19 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::Environment'
     Properties:
       ApplicationName: !Ref EBServerApplication
-      Description: 'Imagery server: AWS in Action: chapter 13'
+      Description: 'Imagery server: AWS in Action: chapter 16'
       TemplateName: !Ref EBServerConfigurationTemplate
       VersionLabel: !Ref EBServerApplicationVersion
   EBServerApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
     Properties:
       ApplicationName: 'imagery-server'
-      Description: 'Imagery server: AWS in Action: chapter 13'
+      Description: 'Imagery server: AWS in Action: chapter 16'
   EBServerApplicationVersion:
     Type: 'AWS::ElasticBeanstalk::ApplicationVersion'
     Properties:
       ApplicationName: !Ref EBServerApplication
-      Description: 'Imagery server: AWS in Action: chapter 13'
+      Description: 'Imagery server: AWS in Action: chapter 16'
       SourceBundle:
         S3Bucket: 'awsinaction-code2'
         S3Key: 'chapter16/build/server.zip'
