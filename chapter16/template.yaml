@@ -9,7 +9,7 @@ Parameters:
 Resources:
   Bucket:
     Type: 'AWS::S3::Bucket'
-    Properties: 
+    Properties:
       BucketName: !Sub 'imagery-${AWS::AccountId}'
       WebsiteConfiguration:
         ErrorDocument: error.html
@@ -41,7 +41,7 @@ Resources:
   WorkerInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      Roles: 
+      Roles:
       - !Ref WorkerRole
   WorkerRole:
     Type: 'AWS::IAM::Role'
@@ -83,7 +83,7 @@ Resources:
             - 's3:Get*'
             - 's3:List*'
             - 's3:PutObject'
-            Resource: 
+            Resource:
             - !Sub 'arn:aws:s3:::elasticbeanstalk-*-${AWS::AccountId}/*'
             - !Sub 'arn:aws:s3:::elasticbeanstalk-*-${AWS::AccountId}-*/*'
       - PolicyName: 's3-image'
