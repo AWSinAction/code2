@@ -1,26 +1,11 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS in Action: chapter 11 (Snapshot)'
+Description: 'AWS in Action: chapter 17 (Wordpress)'
 Parameters:
   KeyName:
     Description: 'Key Pair name'
     Type: 'AWS::EC2::KeyPair::KeyName'
     Default: mykey
-  BlogTitle:
-    Description: 'The title of the blog.'
-    Type: String
-    Default: 'Amazon Web Services in Action - Example'
-  AdminUsername:
-    Description: 'A username for admin.'
-    Type: String
-    Default: admin
-  AdminPassword:
-    Description: 'A password for admin'
-    Type: String
-    NoEcho: true
-  AdminEMail:
-    Description: 'The email address of the administrator.'
-    Type: String
 Mappings:
   RegionMap:
     'ap-south-1':
@@ -203,8 +188,7 @@ Resources:
     DeletionPolicy: Delete # For AWS::RDS::DBInstance resources that don't specify the DBClusterIdentifier property, the default policy is Snapshot which can cause unwanted costs. However, for production setups, we highly recommend to stay with the default to avoid data loss.
     Properties:
       AllocatedStorage: 5
-      BackupRetentionPeriod: 3
-      PreferredBackupWindow: '05:00-06:00'
+      BackupRetentionPeriod: 0
       DBInstanceClass: 'db.t2.micro'
       DBName: wordpress
       Engine: MySQL
@@ -287,7 +271,7 @@ Resources:
                   if ! php wp-cli.phar core is-installed --allow-root; then
                     php wp-cli.phar core download --allow-root --version=4.8
                     php wp-cli.phar core config --dbname='wordpress' --dbuser='wordpress' --dbpass='wordpress' --dbhost='${Database.Endpoint.Address}' --allow-root
-                    php wp-cli.phar core install --url='http://${LoadBalancer.DNSName}' --title='${BlogTitle}' --admin_user='${AdminUsername}' --admin_password='${AdminPassword}' --admin_email='${AdminEMail}' --skip-email --allow-root
+                    php wp-cli.phar core install --url='http://${LoadBalancer.DNSName}' --title='AWS in Action' --admin_user='admin' --admin_email='test@example.com' --skip-email --allow-root
                   fi
                   chown -R apache:apache /var/www/html
                   chmod u+wrx /var/www/html/wp-content/*
@@ -347,6 +331,52 @@ Resources:
       AutoScalingRollingUpdate:
         PauseTime: PT10M
         WaitOnResourceSignals: true
+  ScalingUpPolicy:
+    Type: 'AWS::AutoScaling::ScalingPolicy'
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      Cooldown: 60
+      ScalingAdjustment: 1
+  CPUHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      EvaluationPeriods: 1
+      Statistic: Average
+      Threshold: 60
+      AlarmDescription: 'Alarm if CPU load is high.'
+      Period: 60
+      AlarmActions:
+      - !Ref ScalingUpPolicy
+      Namespace: 'AWS/EC2'
+      Dimensions:
+      - Name: AutoScalingGroupName
+        Value: !Ref AutoScalingGroup
+      ComparisonOperator: GreaterThanThreshold
+      MetricName: CPUUtilization
+  ScalingDownPolicy:
+    Type: 'AWS::AutoScaling::ScalingPolicy'
+    Properties:
+      AdjustmentType: ChangeInCapacity
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      Cooldown: 60
+      ScalingAdjustment: -1
+  CPULowAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      EvaluationPeriods: 1
+      Statistic: Average
+      Threshold: 20
+      AlarmDescription: 'Alarm if CPU load is low.'
+      Period: 60
+      AlarmActions:
+      - !Ref ScalingDownPolicy
+      Namespace: 'AWS/EC2'
+      Dimensions:
+      - Name: AutoScalingGroupName
+        Value: !Ref AutoScalingGroup
+      ComparisonOperator: LessThanThreshold
+      MetricName: CPUUtilization
 Outputs:
   URL:
     Value: !Sub 'http://${LoadBalancer.DNSName}'

@@ -336,7 +336,7 @@ Resources:
       HealthCheckType: ELB
       VPCZoneIdentifier:
       - !Ref SubnetA
-      - !Ref SubnetA
+      - !Ref SubnetB
       Tags:
       - PropagateAtLaunch: true
         Value: wordpress
