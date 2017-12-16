@@ -353,7 +353,7 @@ Resources:
       EstimatedInstanceWarmup: 120
   LoadTestInstance:
     Type: 'AWS::EC2::Instance'
-    DependsOn: 
+    DependsOn:
     - VPCGatewayAttachment
     - AutoScalingGroup
     Properties:
