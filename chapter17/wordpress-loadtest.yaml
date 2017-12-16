@@ -325,7 +325,6 @@ Resources:
       MinSize: 2
       MaxSize: 4
       DesiredCapacity: 2
-      Cooldown: 60
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB
       VPCZoneIdentifier:
@@ -342,55 +341,21 @@ Resources:
       AutoScalingRollingUpdate:
         PauseTime: PT10M
         WaitOnResourceSignals: true
-  ScalingUpPolicy:
+  ScalingPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:
-      AdjustmentType: ChangeInCapacity
       AutoScalingGroupName: !Ref AutoScalingGroup
-      Cooldown: 60
-      ScalingAdjustment: 1
-  CPUHighAlarm:
-    Type: 'AWS::CloudWatch::Alarm'
-    Properties:
-      EvaluationPeriods: 1
-      Statistic: Average
-      Threshold: 60
-      AlarmDescription: 'Alarm if CPU load is high.'
-      Period: 60
-      AlarmActions:
-      - !Ref ScalingUpPolicy
-      Namespace: 'AWS/EC2'
-      Dimensions:
-      - Name: AutoScalingGroupName
-        Value: !Ref AutoScalingGroup
-      ComparisonOperator: GreaterThanThreshold
-      MetricName: CPUUtilization
-  ScalingDownPolicy:
-    Type: 'AWS::AutoScaling::ScalingPolicy'
-    Properties:
-      AdjustmentType: ChangeInCapacity
-      AutoScalingGroupName: !Ref AutoScalingGroup
-      Cooldown: 60
-      ScalingAdjustment: -1
-  CPULowAlarm:
-    Type: 'AWS::CloudWatch::Alarm'
-    Properties:
-      EvaluationPeriods: 1
-      Statistic: Average
-      Threshold: 20
-      AlarmDescription: 'Alarm if CPU load is low.'
-      Period: 60
-      AlarmActions:
-      - !Ref ScalingDownPolicy
-      Namespace: 'AWS/EC2'
-      Dimensions:
-      - Name: AutoScalingGroupName
-        Value: !Ref AutoScalingGroup
-      ComparisonOperator: LessThanThreshold
-      MetricName: CPUUtilization
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70
+      EstimatedInstanceWarmup: 120
   LoadTestInstance:
     Type: 'AWS::EC2::Instance'
-    DependsOn: VPCGatewayAttachment
+    DependsOn: 
+    - VPCGatewayAttachment
+    - AutoScalingGroup
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
       InstanceType: 't2.micro'
@@ -398,8 +363,8 @@ Resources:
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash -ex
-          yum install -y httpd-tools
-          ab -n 50000 -c 10 http://${LoadBalancer.DNSName}/
+          yum install -y httpd24-tools
+          ab -n 100000 -c 15 -t 300 -s 120 -r http://${LoadBalancer.DNSName}/
       Tags:
       - Key: Name
         Value: 'wordpress-loadtest'
