@@ -344,7 +344,7 @@ Resources:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
         TargetValue: 70
-      EstimatedInstanceWarmup: 120
+      EstimatedInstanceWarmup: 60
 Outputs:
   URL:
     Value: !Sub 'http://${LoadBalancer.DNSName}'

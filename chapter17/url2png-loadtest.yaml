@@ -210,10 +210,15 @@ Resources:
   ScalingUpPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:
-      AdjustmentType: ChangeInCapacity
+      AdjustmentType: 'ChangeInCapacity'
       AutoScalingGroupName: !Ref AutoScalingGroup
-      Cooldown: 60
-      ScalingAdjustment: 1
+      PolicyType: 'StepScaling'
+      MetricAggregationType: 'Average'
+      EstimatedInstanceWarmup: 60
+      StepAdjustments:
+      - MetricIntervalLowerBound: 0
+        MetricIntervalUpperBound: 100
+        ScalingAdjustment: 1
   HighQueueAlarm:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
@@ -233,10 +238,15 @@ Resources:
   ScalingDownPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:
-      AdjustmentType: ChangeInCapacity
+      AdjustmentType: 'ChangeInCapacity'
       AutoScalingGroupName: !Ref AutoScalingGroup
-      Cooldown: 60
-      ScalingAdjustment: -1
+      PolicyType: 'StepScaling'
+      MetricAggregationType: 'Average'
+      EstimatedInstanceWarmup: 60
+      StepAdjustments:
+      - MetricIntervalLowerBound: 0
+        MetricIntervalUpperBound: 100
+        ScalingAdjustment: -1
   LowQueueAlarm:
     Type: 'AWS::CloudWatch::Alarm'
     Properties:
