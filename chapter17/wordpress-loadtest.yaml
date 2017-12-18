@@ -369,7 +369,7 @@ Resources:
         'Fn::Base64': !Sub |
           #!/bin/bash -ex
           yum install -y httpd24-tools
-          ab -n 500000 -c 15 -t 300 -s 120 -r http://${LoadBalancer.DNSName}/
+          ab -n 500000 -c 15 -t 360 -s 120 -r http://${LoadBalancer.DNSName}/
       Tags:
       - Key: Name
         Value: 'wordpress-loadtest'
