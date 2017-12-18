@@ -6,6 +6,11 @@ Parameters:
     Description: 'Key Pair name'
     Type: 'AWS::EC2::KeyPair::KeyName'
     Default: mykey
+  WordpressAdminPassword:
+    Description: 'The password for the Wordpress administrator.'
+    Type: String
+    AllowedPattern: '[A-Za-z0-9]{8,30}'
+    ConstraintDescription: 'WordpressAdminPassword must match [A-Za-z0-9]{8,30}'
 Mappings:
   RegionMap:
     'ap-south-1':
@@ -271,7 +276,7 @@ Resources:
                   if ! php wp-cli.phar core is-installed --allow-root; then
                     php wp-cli.phar core download --allow-root --version=4.8
                     php wp-cli.phar core config --dbname='wordpress' --dbuser='wordpress' --dbpass='wordpress' --dbhost='${Database.Endpoint.Address}' --allow-root
-                    php wp-cli.phar core install --url='http://${LoadBalancer.DNSName}' --title='AWS in Action' --admin_user='admin' --admin_email='test@example.com' --skip-email --allow-root
+                    php wp-cli.phar core install --url='http://${LoadBalancer.DNSName}' --title='AWS in Action' --admin_user='admin' --admin_password='${WordpressAdminPassword}' --admin_email='test@example.com' --skip-email --allow-root
                   fi
                   chown -R apache:apache /var/www/html
                   chmod u+wrx /var/www/html/wp-content/*
