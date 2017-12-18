@@ -196,7 +196,6 @@ Resources:
       MinSize: 1
       MaxSize: 2
       DesiredCapacity: 1
-      Cooldown: 60
       HealthCheckGracePeriod: 120
       HealthCheckType: EC2
       VPCZoneIdentifier:
