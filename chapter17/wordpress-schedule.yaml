@@ -178,17 +178,6 @@ Resources:
         IpProtocol: tcp
         SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
         ToPort: 80
-  LoadTestSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: awsinaction-sg
-      VpcId:
-        Ref: VPC
-      SecurityGroupIngress:
-      - CidrIp: 0.0.0.0/0
-        FromPort: 22
-        IpProtocol: tcp
-        ToPort: 22
   DatabaseSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -346,39 +335,28 @@ Resources:
       AutoScalingRollingUpdate:
         PauseTime: PT10M
         WaitOnResourceSignals: true
-  ScalingPolicy:
-    Type: 'AWS::AutoScaling::ScalingPolicy'
+        SuspendProcesses:
+        - ScheduledActions
+      AutoScalingScheduledAction:
+        IgnoreUnmodifiedGroupSizeProperties: true
+  OneTimeScheduledActionUp:
+    Type: 'AWS::AutoScaling::ScheduledAction'
     Properties:
       AutoScalingGroupName: !Ref AutoScalingGroup
-      PolicyType: TargetTrackingScaling
-      TargetTrackingConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 70
-      EstimatedInstanceWarmup: 120
-  LoadTestInstance:
-    Type: 'AWS::EC2::Instance'
-    DependsOn:
-    - VPCGatewayAttachment
-    - AutoScalingGroup
+      DesiredCapacity: 4
+      StartTime: '2018-01-01T12:00:00Z'
+  RecurringScheduledActionUp:
+    Type: 'AWS::AutoScaling::ScheduledAction'
     Properties:
-      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
-      InstanceType: 't2.micro'
-      KeyName: !Ref KeyName
-      UserData:
-        'Fn::Base64': !Sub |
-          #!/bin/bash -ex
-          yum install -y httpd24-tools
-          ab -n 100000 -c 15 -t 300 -s 120 -r http://${LoadBalancer.DNSName}/
-      Tags:
-      - Key: Name
-        Value: 'wordpress-loadtest'
-      NetworkInterfaces:
-      - AssociatePublicIpAddress: 'true'
-        DeviceIndex: '0'
-        GroupSet:
-        - !Ref LoadTestSecurityGroup
-        SubnetId: !Ref SubnetA
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      DesiredCapacity: 4
+      Recurrence: '0 8 * * *'
+  RecurringScheduledActionDown:
+    Type: 'AWS::AutoScaling::ScheduledAction'
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      DesiredCapacity: 2
+      Recurrence: '0 20 * * *'
 Outputs:
   URL:
     Value: !Sub 'http://${LoadBalancer.DNSName}'
