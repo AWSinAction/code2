@@ -217,8 +217,7 @@ Resources:
       KeyName: !Ref KeyName
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -ex
-          yum update -y aws-cfn-bootstrap
+          #!/bin/bash -x
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfiguration --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
   AutoScalingGroup:

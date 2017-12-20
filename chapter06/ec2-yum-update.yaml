@@ -72,7 +72,7 @@ Resources:
         Value: 'AWS in Action: chapter 6 (yum update)'
       UserData:
         'Fn::Base64': |
-          #!/bin/bash -ex
+          #!/bin/bash -x
           yum -y update
 Outputs:
   InstancePublicName:

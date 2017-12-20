@@ -245,7 +245,7 @@ Resources:
             echo "/swapfile1 none swap sw 0 0" >> /etc/fstab
 
             # get public IP address of this EC2 instance
-            PUBLICIP=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/public-ipv4)
+            PUBLICIP="$(curl -s -m 60 http://169.254.169.254/latest/meta-data/public-ipv4)"
 
             # install packages
             yum -y group install "Development Tools"

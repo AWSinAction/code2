@@ -4,10 +4,11 @@
 #param VPN_USER the vpn username
 #param VPN_PASSWORD the vpn password
  
-PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
-PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+PRIVATE_IP="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
+PUBLIC_IP="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
 
-yum-config-manager --enable epel && yum clean all
+yum-config-manager --enable epel
+yum clean all
 yum install -y openswan xl2tpd
 
 cat > /etc/ipsec.conf <<EOF
@@ -93,5 +94,8 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 exit 0
 EOF
 
-service ipsec start && service xl2tpd start
-chkconfig ipsec on && chkconfig xl2tpd on
+service ipsec start
+service xl2tpd start
+
+chkconfig ipsec on
+chkconfig xl2tpd on

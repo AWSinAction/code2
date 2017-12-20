@@ -64,10 +64,10 @@ Resources:
       SubnetId: !Ref Subnet
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -ex
-          export IPSEC_PSK=${IPSecSharedSecret}
-          export VPN_USER=${VPNUser}
-          export VPN_PASSWORD=${VPNPassword}
+          #!/bin/bash -x
+          export IPSEC_PSK="${IPSecSharedSecret}"
+          export VPN_USER="${VPNUser}"
+          export VPN_PASSWORD="${VPNPassword}"
           curl -s https://raw.githubusercontent.com/AWSinAction/code2/master/chapter05/vpn-setup.sh | bash -ex
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2Instance --region ${AWS::Region}
     CreationPolicy:
