@@ -172,12 +172,13 @@ Resources:
   LaunchConfiguration:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
     Properties:
+      AssociatePublicIpAddress: true
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceMonitoring: false
       InstanceType: t2.micro
       SecurityGroups:
       - !Ref SecurityGroup
       KeyName: !Ref KeyName
-      AssociatePublicIpAddress: true
       IamInstanceProfile: !Ref IamInstanceProfile
       UserData:
         'Fn::Base64': !Sub |

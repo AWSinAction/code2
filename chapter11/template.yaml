@@ -309,6 +309,7 @@ Resources:
     Properties:
       AssociatePublicIpAddress: true
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceMonitoring: false
       InstanceType: 't2.micro'
       SecurityGroups:
       - !Ref WebServerSecurityGroup

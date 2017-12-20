@@ -5,7 +5,7 @@ Parameters:
   KeyName:
     Description: 'Key Pair name'
     Type: 'AWS::EC2::KeyPair::KeyName'
-    Default: 'mykey'
+    Default: mykey
   NumberOfVirtualMachines:
     Description: 'Number of virtual machines'
     Type: Number
@@ -208,13 +208,13 @@ Resources:
                 enabled: true
                 ensureRunning: true
     Properties:
-      EbsOptimized: false
+      AssociatePublicIpAddress: true
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceMonitoring: false
       InstanceType: 't2.micro'
       SecurityGroups:
       - !Ref WebServerSecurityGroup
       KeyName: !Ref KeyName
-      AssociatePublicIpAddress: true
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash -ex
