@@ -7,8 +7,8 @@ const ec2 = new AWS.EC2({
 module.exports = (cb) => {
   ec2.describeImages({
     Filters: [{
-      Name: 'description',
-      Values: ['Amazon Linux AMI 2017.03.1.* x86_64 HVM GP2']
+      Name: 'name',
+      Values: ['amzn-ami-hvm-2017.09.1.*-x86_64-gp2']
     }]
   }, (err, data) => {
     if (err) {
