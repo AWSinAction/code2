@@ -244,7 +244,7 @@ Resources:
       MetricAggregationType: 'Average'
       EstimatedInstanceWarmup: 60
       StepAdjustments:
-      - MetricIntervalLowerBound: 0
+      - MetricIntervalUpperBound: 0
         ScalingAdjustment: -1
   LowQueueAlarm:
     Type: 'AWS::CloudWatch::Alarm'
