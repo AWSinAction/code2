@@ -96,7 +96,6 @@ function uploadImage(image, part, response) {
             if (err) {
               throw err;
             } else {
-              //response.json(lib.mapImage(data.Attributes));
               response.redirect('/#view=' + image.id);
               response.end();
             }

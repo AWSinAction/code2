@@ -96,7 +96,6 @@ function processImage(image, cb) {
                       'Body': buf,
                       'ContentType': 'image/png'
                     }, function(err) {
-                      console.log('s3.putObject', err); // TODO debug only
                       if (err) {
                         cb(err);
                       } else {
