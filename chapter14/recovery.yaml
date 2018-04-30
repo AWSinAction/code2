@@ -181,7 +181,7 @@ Resources:
 
           # start jenkins
           service jenkins start
-          
+
           # signal success
           /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource VM --region ${AWS::Region}
       Tags:

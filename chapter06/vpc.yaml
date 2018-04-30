@@ -524,7 +524,7 @@ Resources:
           echo "}" >> /etc/varnish/default.vcl
           sed -i.bak "s/^VARNISH_LISTEN_PORT=.*/VARNISH_LISTEN_PORT=80/" /etc/sysconfig/varnish
           service varnish start
-          
+
           # signal success
           /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region}
       Tags:
@@ -555,7 +555,7 @@ Resources:
 
           yum -y install httpd
           service httpd start
-          
+
           # signal success
           /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region}
       Tags:

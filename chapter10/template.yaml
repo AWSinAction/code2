@@ -208,7 +208,7 @@ Resources:
 
           # copy /oldhome to new /home
           cp -a /oldhome/. /home
-          
+
           # signal success
           /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource EC2InstanceA --region ${AWS::Region}
     CreationPolicy:
@@ -244,7 +244,7 @@ Resources:
           # mount EFS file system
           echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
           mount -a
-          
+
           # signal success
           /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource EC2InstanceB --region ${AWS::Region}
     CreationPolicy:

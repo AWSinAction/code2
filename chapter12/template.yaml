@@ -299,7 +299,7 @@ Resources:
 
           # start Nginx
           service nginx start
-          
+
           # signal success
           /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource VMInstance --region ${AWS::Region}
     CreationPolicy:
