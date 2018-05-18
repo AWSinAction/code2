@@ -124,3 +124,13 @@ aws dynamodb update-table --table-name todo-task --attribute-definitions Attribu
 * due: number (yyyymmdd)
 * created: number (yyyymmdd)
 * completed: number (yyyymmdd)
+
+## demo
+
+```
+$ node index.js user-add michael michael@widdix.de +4971537507824
+$ node index.js task-add michael "book flight to AWS re:Invent"
+$ node index.js task-add michael "revise chapter 10"
+$ node index.js task-ls michael
+$ node index.js task-done michael <tid>
+```
