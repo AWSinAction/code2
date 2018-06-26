@@ -14,4 +14,4 @@ install:
 script:
 - 'yamllint .'
 - 'find . -type f -name ''*.sh'' | while read file; do set -ex && shellcheck -s bash "$file"; done'
-- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then find . -type f -name ''*.y?ml'' | while read file; do set -ex && aws cloudformation validate-template --template-body "file://$file" > /dev/null; done; fi'
+- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then find . -type f \( -name ''*.yml'' -o -name ''.yaml'' \) -a ! -name ''.*'' | while read file; do set -ex && aws cloudformation validate-template --template-body "file://$file" > /dev/null; done; fi'
