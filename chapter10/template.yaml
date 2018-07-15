@@ -190,24 +190,27 @@ Resources:
         SubnetId: !Ref SubnetA
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          bash -ex << "TRY"
-            # wait until EFS file system is available
-            while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
-            sleep 10
+          #!/bin/bash -ex
+          # execute on error to signal failure
+          trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource EC2InstanceA --region ${AWS::Region}' ERR
 
-            # copy existing /home to /oldhome
-            mkdir /oldhome
-            cp -a /home/. /oldhome
+          # wait until EFS file system is available
+          while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
+          sleep 10
 
-            # mount EFS file system
-            echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
-            mount -a
+          # copy existing /home to /oldhome
+          mkdir /oldhome
+          cp -a /home/. /oldhome
 
-            # copy /oldhome to new /home
-            cp -a /oldhome/. /home
-          TRY
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2InstanceA --region ${AWS::Region}
+          # mount EFS file system
+          echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
+          mount -a
+
+          # copy /oldhome to new /home
+          cp -a /oldhome/. /home
+
+          # signal success
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource EC2InstanceA --region ${AWS::Region}
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M
@@ -230,17 +233,20 @@ Resources:
         SubnetId: !Ref SubnetB
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          bash -ex << "TRY"
-            # wait until EFS file system is available
-            while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
-            sleep 10
+          #!/bin/bash -ex
+          # execute on error to signal failure
+          trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource EC2InstanceB --region ${AWS::Region}' ERR
 
-            # mount EFS file system
-            echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
-            mount -a
-          TRY
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2InstanceB --region ${AWS::Region}
+          # wait until EFS file system is available
+          while ! nc -z ${FileSystem}.efs.${AWS::Region}.amazonaws.com 2049; do sleep 10; done
+          sleep 10
+
+          # mount EFS file system
+          echo "${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /home nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
+          mount -a
+
+          # signal success
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource EC2InstanceB --region ${AWS::Region}
     CreationPolicy:
       ResourceSignal:
         Timeout: PT10M

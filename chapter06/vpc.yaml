@@ -513,17 +513,20 @@ Resources:
         - !Ref SecurityGroup
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          bash -ex << "TRY"
-            yum -y install varnish-3.0.7
-            echo "backend default {" > /etc/varnish/default.vcl
-            echo "  .host = \"${ApacheWebserver.PrivateIp}\";" >> /etc/varnish/default.vcl
-            echo "  .port = \"80\";" >> /etc/varnish/default.vcl
-            echo "}" >> /etc/varnish/default.vcl
-            sed -i.bak "s/^VARNISH_LISTEN_PORT=.*/VARNISH_LISTEN_PORT=80/" /etc/sysconfig/varnish
-            service varnish start
-          TRY
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region}
+          #!/bin/bash -ex
+          # execute on error to signal failure
+          trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region}' ERR
+
+          yum -y install varnish-3.0.7
+          echo "backend default {" > /etc/varnish/default.vcl
+          echo "  .host = \"${ApacheWebserver.PrivateIp}\";" >> /etc/varnish/default.vcl
+          echo "  .port = \"80\";" >> /etc/varnish/default.vcl
+          echo "}" >> /etc/varnish/default.vcl
+          sed -i.bak "s/^VARNISH_LISTEN_PORT=.*/VARNISH_LISTEN_PORT=80/" /etc/sysconfig/varnish
+          service varnish start
+
+          # signal success
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource VarnishProxy --region ${AWS::Region}
       Tags:
       - Key: Name
         Value: 'Varnish Proxy'
@@ -546,12 +549,15 @@ Resources:
         - !Ref SecurityGroup
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          bash -ex << "TRY"
-            yum -y install httpd
-            service httpd start
-          TRY
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region}
+          #!/bin/bash -ex
+          # execute on error to signal failure
+          trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region}' ERR
+
+          yum -y install httpd
+          service httpd start
+
+          # signal success
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource ApacheWebserver --region ${AWS::Region}
       Tags:
       - Key: Name
         Value: 'Apache Webserver'

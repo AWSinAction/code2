@@ -235,70 +235,73 @@ Resources:
         SubnetId: !Ref SubnetA
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          bash -ex << "TRY"
-            # t2.micro may not have enough memory, so we add a 512MB swapfile
-            dd if=/dev/zero of=/swapfile1 bs=1024 count=524288
-            chmod 0600 /swapfile1
-            mkswap /swapfile1
-            swapon /swapfile1
-            echo "/swapfile1 none swap sw 0 0" >> /etc/fstab
+          #!/bin/bash -ex
+          # execute on error to signal failure
+          trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource VMInstance --region ${AWS::Region}' ERR
 
-            # get public IP address of this EC2 instance
-            PUBLICIP="$(curl -s -m 60 http://169.254.169.254/latest/meta-data/public-ipv4)"
+          # t2.micro may not have enough memory, so we add a 512MB swapfile
+          dd if=/dev/zero of=/swapfile1 bs=1024 count=524288
+          chmod 0600 /swapfile1
+          mkswap /swapfile1
+          swapon /swapfile1
+          echo "/swapfile1 none swap sw 0 0" >> /etc/fstab
 
-            # install packages
-            yum -y group install "Development Tools"
-            yum -y install git zlib-devel postgresql95-devel libyaml-devel ImageMagick ruby23-devel nginx
-            yum -y install --enablerepo=epel optipng jhead jpegoptim gifsicle libjpeg-turbo-utils
-            update-alternatives --set ruby /usr/bin/ruby2.3
-            gem install rails bundler --no-ri --no-rdoc
+          # get public IP address of this EC2 instance
+          PUBLICIP="$(curl -s -m 60 http://169.254.169.254/latest/meta-data/public-ipv4)"
 
-            # download Discourse
-            useradd discourse
-            mkdir /opt/discourse
-            git clone https://github.com/AWSinAction/discourse.git /opt/discourse
+          # install packages
+          yum -y group install "Development Tools"
+          yum -y install git zlib-devel postgresql95-devel libyaml-devel ImageMagick ruby23-devel nginx
+          yum -y install --enablerepo=epel optipng jhead jpegoptim gifsicle libjpeg-turbo-utils
+          update-alternatives --set ruby /usr/bin/ruby2.3
+          gem install rails bundler --no-ri --no-rdoc
 
-            # configure Discourse
-            echo "gem 'psych'" >> /opt/discourse/Gemfile
-            echo "gem 'json'" >> /opt/discourse/Gemfile
-            echo "gem 'bigdecimal'" >> /opt/discourse/Gemfile
-            echo "db_host = \"${Database.Endpoint.Address}\"" > /opt/discourse/config/discourse.conf
-            echo "db_password = \"discourse\"" >> /opt/discourse/config/discourse.conf
-            echo "redis_host = \"${Cache.RedisEndpoint.Address}\"" >> /opt/discourse/config/discourse.conf
-            echo "hostname = \"$PUBLICIP\"" >> /opt/discourse/config/discourse.conf
-            echo "serve_static_assets = true" >> /opt/discourse/config/discourse.conf
-            echo "developer_emails = \"${AdminEmailAddress}\"" >> /opt/discourse/config/discourse.conf
-            echo "notification_email = \"${AdminEmailAddress}\"" >> /opt/discourse/config/discourse.conf
-            echo "smtp_address = \"localhost\"" >> /opt/discourse/config/discourse.conf
-            echo "smtp_port = 25" >> /opt/discourse/config/discourse.conf
-            echo "smtp_enable_start_tls = false" >> /opt/discourse/config/discourse.conf
-            echo "smtp_openssl_verify_mode = none" >> /opt/discourse/config/discourse.conf
-            sed -i 's/development:/production:/g' /opt/discourse/config/sidekiq.yml
-            chown -R discourse:discourse /opt/discourse
+          # download Discourse
+          useradd discourse
+          mkdir /opt/discourse
+          git clone https://github.com/AWSinAction/discourse.git /opt/discourse
 
-            # prepare Discourse
-            runuser -l discourse -c 'cd /opt/discourse && bundle install'
-            runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec rake db:migrate'
-            runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec rake assets:precompile'
+          # configure Discourse
+          echo "gem 'psych'" >> /opt/discourse/Gemfile
+          echo "gem 'json'" >> /opt/discourse/Gemfile
+          echo "gem 'bigdecimal'" >> /opt/discourse/Gemfile
+          echo "db_host = \"${Database.Endpoint.Address}\"" > /opt/discourse/config/discourse.conf
+          echo "db_password = \"discourse\"" >> /opt/discourse/config/discourse.conf
+          echo "redis_host = \"${Cache.RedisEndpoint.Address}\"" >> /opt/discourse/config/discourse.conf
+          echo "hostname = \"$PUBLICIP\"" >> /opt/discourse/config/discourse.conf
+          echo "serve_static_assets = true" >> /opt/discourse/config/discourse.conf
+          echo "developer_emails = \"${AdminEmailAddress}\"" >> /opt/discourse/config/discourse.conf
+          echo "notification_email = \"${AdminEmailAddress}\"" >> /opt/discourse/config/discourse.conf
+          echo "smtp_address = \"localhost\"" >> /opt/discourse/config/discourse.conf
+          echo "smtp_port = 25" >> /opt/discourse/config/discourse.conf
+          echo "smtp_enable_start_tls = false" >> /opt/discourse/config/discourse.conf
+          echo "smtp_openssl_verify_mode = none" >> /opt/discourse/config/discourse.conf
+          sed -i 's/development:/production:/g' /opt/discourse/config/sidekiq.yml
+          chown -R discourse:discourse /opt/discourse
 
-            # start Discourse
-            runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec sidekiq -L log/sidekiq.log -e production -d'
-            runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec rails s -d'
+          # prepare Discourse
+          runuser -l discourse -c 'cd /opt/discourse && bundle install'
+          runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec rake db:migrate'
+          runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec rake assets:precompile'
 
-            # configure Nginx to forward port 80 to 3000
-            echo "server {" > /etc/nginx/conf.d/discourse.conf
-            echo "  listen 80;" >> /etc/nginx/conf.d/discourse.conf
-            echo "  server_name $PUBLICIP;" >> /etc/nginx/conf.d/discourse.conf
-            echo "  location / {" >> /etc/nginx/conf.d/discourse.conf
-            echo "    proxy_pass http://127.0.0.1:3000;" >> /etc/nginx/conf.d/discourse.conf
-            echo "  }" >> /etc/nginx/conf.d/discourse.conf
-            echo "}" >> /etc/nginx/conf.d/discourse.conf
+          # start Discourse
+          runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec sidekiq -L log/sidekiq.log -e production -d'
+          runuser -l discourse -c 'cd /opt/discourse && RAILS_ENV=production bundle exec rails s -d'
 
-            # start Nginx
-            service nginx start
-          TRY
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource VMInstance --region ${AWS::Region}
+          # configure Nginx to forward port 80 to 3000
+          echo "server {" > /etc/nginx/conf.d/discourse.conf
+          echo "  listen 80;" >> /etc/nginx/conf.d/discourse.conf
+          echo "  server_name $PUBLICIP;" >> /etc/nginx/conf.d/discourse.conf
+          echo "  location / {" >> /etc/nginx/conf.d/discourse.conf
+          echo "    proxy_pass http://127.0.0.1:3000;" >> /etc/nginx/conf.d/discourse.conf
+          echo "  }" >> /etc/nginx/conf.d/discourse.conf
+          echo "}" >> /etc/nginx/conf.d/discourse.conf
+
+          # start Nginx
+          service nginx start
+
+          # signal success
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource VMInstance --region ${AWS::Region}
     CreationPolicy:
       ResourceSignal:
         Timeout: PT15M

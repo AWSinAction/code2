@@ -166,23 +166,26 @@ Resources:
       - !Ref SecurityGroup
       UserData:
         'Fn::Base64': !Sub |
-          #!/bin/bash -x
-          bash -ex << "TRY"
-            # install Jenkins
-            wget -q -T 60 https://pkg.jenkins.io/redhat/jenkins-1.616-1.1.noarch.rpm
-            rpm --install jenkins-1.616-1.1.noarch.rpm
+          #!/bin/bash -ex
+          # execute on error to signal failure
+          trap '/opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}' ERR
 
-            # configure Jenkins
-            sed -i -e 's/JENKINS_ARGS=""/JENKINS_ARGS="--argumentsRealm.passwd.admin=${JenkinsAdminPassword} --argumentsRealm.roles.admin=admin"/g' /etc/sysconfig/jenkins
-            if [ ! -f /var/lib/jenkins/config.xml ]; then
-              echo '<?xml version="1.0" encoding="UTF-8"?><hudson><version>1.0</version><useSecurity>true</useSecurity><authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/><securityRealm class="hudson.security.LegacySecurityRealm"/></hudson>' > /var/lib/jenkins/config.xml
-              chown jenkins:jenkins /var/lib/jenkins/config.xml
-            fi
+          # install Jenkins
+          wget -q -T 60 https://pkg.jenkins.io/redhat/jenkins-1.616-1.1.noarch.rpm
+          rpm --install jenkins-1.616-1.1.noarch.rpm
 
-            # start jenkins
-            service jenkins start
-          TRY
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+          # configure Jenkins
+          sed -i -e 's/JENKINS_ARGS=""/JENKINS_ARGS="--argumentsRealm.passwd.admin=${JenkinsAdminPassword} --argumentsRealm.roles.admin=admin"/g' /etc/sysconfig/jenkins
+          if [ ! -f /var/lib/jenkins/config.xml ]; then
+            echo '<?xml version="1.0" encoding="UTF-8"?><hudson><version>1.0</version><useSecurity>true</useSecurity><authorizationStrategy class="hudson.security.FullControlOnceLoggedInAuthorizationStrategy"/><securityRealm class="hudson.security.LegacySecurityRealm"/></hudson>' > /var/lib/jenkins/config.xml
+            chown jenkins:jenkins /var/lib/jenkins/config.xml
+          fi
+
+          # start jenkins
+          service jenkins start
+
+          # signal success
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
   AutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
