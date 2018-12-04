@@ -1,6 +1,6 @@
 const fs = require('fs');
 const AWS = require('aws-sdk');
-const webshot = require('webshot');
+const webshot = require('node-webshot');
 const config = require('./config.json');
 const sqs = new AWS.SQS({
   region: 'us-east-1'
