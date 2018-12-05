@@ -8,8 +8,8 @@ env:
 python:
 - '2.7'
 install:
-- 'pip install yamllint'
-- 'pip install awscli'
+- 'pip install yamllint==1.13.0'
+- 'pip install awscli==1.16.69'
 - 'sudo apt-get install -y shellcheck'
 script:
 - 'yamllint .'
