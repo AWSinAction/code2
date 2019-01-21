@@ -4,7 +4,7 @@
     "express": "4.16.2",
     "body-parser": "1.18.2",
     "assert-plus": "1.0.0",
-    "caman": "4.1.2"
+    "jimp": "0.6.0"
   },
   "private": true
 }

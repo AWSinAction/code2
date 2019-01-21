@@ -2,7 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var AWS = require('aws-sdk');
 var assert = require('assert-plus');
-var Caman = require('caman').Caman;
+var Jimp = require('jimp');
 var fs = require('fs');
 
 var lib = require('./lib.js');
@@ -77,13 +77,11 @@ function processImage(image, cb) {
         if (err) {
           cb(err);
         } else {
-          Caman(rawFile, function () {
-            this.brightness(10);
-            this.contrast(30);
-            this.sepia(60);
-            this.saturation(-30);
-            this.render(function() {
-              this.save(processedFile);
+          Jimp.read(rawFile, (err, lenna) => {
+            if (err) {
+              throw err;
+            } else {
+              lenna.sepia().write(processedFile);
               fs.unlink(rawFile, function() {
                 fs.readFile(processedFile, {'encoding': null}, function(err, buf) {
                   if (err) {
@@ -107,7 +105,7 @@ function processImage(image, cb) {
                   }
                 });
               });
-            });
+            }
           });
         }
       });
