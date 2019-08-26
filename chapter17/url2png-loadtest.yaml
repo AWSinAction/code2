@@ -235,6 +235,7 @@ Resources:
         Value: !Sub '${SQSQueue.QueueName}'
       ComparisonOperator: GreaterThanThreshold
       MetricName: ApproximateNumberOfMessagesVisible
+      TreatMissingData: notBreaching
   ScalingDownPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:
@@ -262,6 +263,7 @@ Resources:
         Value: !Sub '${SQSQueue.QueueName}'
       ComparisonOperator: LessThanThreshold
       MetricName: ApproximateNumberOfMessagesVisible
+      TreatMissingData: notBreaching
   LoadTestServer:
     Type: 'AWS::EC2::Instance'
     DependsOn: VPCGatewayAttachment
