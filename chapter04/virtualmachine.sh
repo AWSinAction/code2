@@ -1,5 +1,6 @@
 #!/bin/bash -e
 # You need to install the AWS Command Line Interface from http://aws.amazon.com/cli/
+# To run and to connect to the instance mykey must be created, you could use this commnad: aws ec2 create-key-pair --key-name mykey --query "KeyMaterial" --output text > mykey.pem && chmod 400 mykey.pem
 AMIID="$(aws ec2 describe-images --filters "Name=name,Values=amzn-ami-hvm-2017.09.1.*-x86_64-gp2" --query "Images[0].ImageId" --output text)"
 VPCID="$(aws ec2 describe-vpcs --filter "Name=isDefault, Values=true" --query "Vpcs[0].VpcId" --output text)"
 SUBNETID="$(aws ec2 describe-subnets --filters "Name=vpc-id, Values=$VPCID" --query "Subnets[0].SubnetId" --output text)"
