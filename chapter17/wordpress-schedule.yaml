@@ -351,7 +351,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref AutoScalingGroup
       DesiredCapacity: 4
-      StartTime: '2020-01-01T12:00:00Z'
+      StartTime: '2022-01-01T12:00:00Z'
   RecurringScheduledActionUp:
     Type: 'AWS::AutoScaling::ScheduledAction'
     Properties:
