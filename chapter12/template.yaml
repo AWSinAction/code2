@@ -260,9 +260,9 @@ Resources:
             git clone https://github.com/AWSinAction/discourse.git /opt/discourse
 
             # configure Discourse
-            echo "gem 'psych'" >> /opt/discourse/Gemfile
-            echo "gem 'json'" >> /opt/discourse/Gemfile
-            echo "gem 'bigdecimal'" >> /opt/discourse/Gemfile
+            echo "gem 'psych', '~> 3.1'" >> /opt/discourse/Gemfile
+            echo "gem 'json', '~> 2.3'" >> /opt/discourse/Gemfile
+            echo "gem 'bigdecimal', '~> 1.4', '>= 1.4.4'" >> /opt/discourse/Gemfile
             echo "db_host = \"${Database.Endpoint.Address}\"" > /opt/discourse/config/discourse.conf
             echo "db_password = \"discourse\"" >> /opt/discourse/config/discourse.conf
             echo "redis_host = \"${Cache.RedisEndpoint.Address}\"" >> /opt/discourse/config/discourse.conf
