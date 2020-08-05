@@ -195,9 +195,8 @@ Resources:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
       LaunchConfigurationName: !Ref LaunchConfiguration
-      MinSize: 1
-      MaxSize: 2
-      DesiredCapacity: 1
+      MinSize: '1'
+      MaxSize: '2'
       HealthCheckGracePeriod: 120
       HealthCheckType: EC2
       VPCZoneIdentifier:
@@ -293,7 +292,7 @@ Resources:
         Value: 'url2png-loadtest'
       NetworkInterfaces:
       - AssociatePublicIpAddress: true
-        DeviceIndex: 0
+        DeviceIndex: '0'
         GroupSet:
         - !Ref SecurityGroup
         SubnetId: !Ref SubnetA

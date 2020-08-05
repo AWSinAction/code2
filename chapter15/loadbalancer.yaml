@@ -226,7 +226,6 @@ Resources:
       LaunchConfigurationName: !Ref LaunchConfiguration
       MinSize: !Ref NumberOfVirtualMachines
       MaxSize: !Ref NumberOfVirtualMachines
-      DesiredCapacity: !Ref NumberOfVirtualMachines
       TargetGroupARNs:
       - !Ref TargetGroup
       VPCZoneIdentifier:

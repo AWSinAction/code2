@@ -183,7 +183,7 @@ Resources:
       NetworkInterfaces:
       - AssociatePublicIpAddress: true
         DeleteOnTermination: true
-        DeviceIndex: 0
+        DeviceIndex: '0'
         GroupSet:
         - !Ref EC2SecurityGroup
         - !Ref EFSClientSecurityGroup
@@ -223,7 +223,7 @@ Resources:
       NetworkInterfaces:
       - AssociatePublicIpAddress: true
         DeleteOnTermination: true
-        DeviceIndex: 0
+        DeviceIndex: '0'
         GroupSet:
         - !Ref EC2SecurityGroup
         - !Ref EFSClientSecurityGroup

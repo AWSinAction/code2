@@ -158,7 +158,7 @@ Resources:
       NetworkInterfaces:
       - AssociatePublicIpAddress: true
         DeleteOnTermination: true
-        DeviceIndex: 0
+        DeviceIndex: '0'
         GroupSet:
         - !Ref SecurityGroup
         SubnetId: !Ref Subnet

@@ -232,9 +232,8 @@ Resources:
       - Key: Name
         Value: 'jenkins-multiaz-efs'
         PropagateAtLaunch: true
-      DesiredCapacity: 1
-      MinSize: 1
-      MaxSize: 1
+      MinSize: '1'
+      MaxSize: '1'
       VPCZoneIdentifier:
       - !Ref SubnetA
       - !Ref SubnetB

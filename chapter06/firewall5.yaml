@@ -57,12 +57,12 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: icmp
-        FromPort: "-1"
-        ToPort: "-1"
+        FromPort: -1
+        ToPort: -1
         CidrIp: '0.0.0.0/0'
       - IpProtocol: tcp
-        FromPort: '22'
-        ToPort: '22'
+        FromPort: 22
+        ToPort: 22
         CidrIp: !Sub '${IpForSSH}/32'
       Tags:
       - Key: Name
@@ -74,8 +74,8 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: '22'
-        ToPort: '22'
+        FromPort: 22
+        ToPort: 22
         SourceSecurityGroupId: !Ref SecurityGroupBastionHost
       Tags:
       - Key: Name
