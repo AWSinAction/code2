@@ -14,6 +14,7 @@ Resources:
   TrailBucket:
     Condition: HasCreateCloudTrail
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Sub '${AWS::StackName}-${AWS::AccountId}'

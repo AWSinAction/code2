@@ -70,7 +70,7 @@ Resources:
       BlockDeviceMappings:
       - DeviceName: '/dev/xvda'
         Ebs:
-          VolumeSize: '8'
+          VolumeSize: 8
           VolumeType: gp2
       - DeviceName: '/dev/xvdb'
         VirtualName: ephemeral0

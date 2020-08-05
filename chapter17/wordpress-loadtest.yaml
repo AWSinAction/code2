@@ -146,7 +146,7 @@ Resources:
     Properties:
       HealthCheckIntervalSeconds: 5
       HealthCheckPath: '/'
-      HealthCheckPort: 80
+      HealthCheckPort: '80'
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 3
       HealthyThresholdCount: 2
@@ -205,7 +205,7 @@ Resources:
     Type: 'AWS::RDS::DBInstance'
     DeletionPolicy: Delete # For AWS::RDS::DBInstance resources that don't specify the DBClusterIdentifier property, the default policy is Snapshot which can cause unwanted costs. However, for production setups, we highly recommend to stay with the default to avoid data loss.
     Properties:
-      AllocatedStorage: 5
+      AllocatedStorage: '5'
       BackupRetentionPeriod: 0
       DBInstanceClass: 'db.t2.micro'
       DBName: wordpress
@@ -269,7 +269,7 @@ Resources:
               httpd24: []
           files:
             '/etc/httpd/conf.d/wordpress.conf':
-              content: !Sub |
+              content: |
                 <Directory "/var/www/html">
                 Options Indexes FollowSymLinks
                 AllowOverride All
@@ -334,9 +334,8 @@ Resources:
       TargetGroupARNs:
       - !Ref LoadBalancerTargetGroup
       LaunchConfigurationName: !Ref LaunchConfiguration
-      MinSize: 2
-      MaxSize: 4
-      DesiredCapacity: 2
+      MinSize: '2'
+      MaxSize: '4'
       HealthCheckGracePeriod: 300
       HealthCheckType: ELB
       VPCZoneIdentifier:
@@ -381,7 +380,7 @@ Resources:
       - Key: Name
         Value: 'wordpress-loadtest'
       NetworkInterfaces:
-      - AssociatePublicIpAddress: 'true'
+      - AssociatePublicIpAddress: true
         DeviceIndex: '0'
         GroupSet:
         - !Ref LoadTestSecurityGroup
