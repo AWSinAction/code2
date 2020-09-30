@@ -10,7 +10,7 @@ Amazon Web Services in Action, Second Edition is a comprehensive introduction to
 
 Fully updated to include the latest revisions and updates to AWS; this new edition also offers three new chapters covering the latest additions to the AWS platform: serverless infrastructure automation with AWS Lambda, sharing data volumes between machines with EFS, and caching data in memory with ElastiCache!
 
-## Code exampless by chapter
+## Code examples by chapter
 
 * 02 [A simple example: WordPress on AWS in five minutes](./chapter02)
 * 03 [Using virtual machines: Amazon EC2](./chapter03)
