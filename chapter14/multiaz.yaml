@@ -169,7 +169,7 @@ Resources:
           #!/bin/bash -x
           bash -ex << "TRY"
             # install Jenkins
-            wget -q -T 60 https://pkg.jenkins.io/redhat/jenkins-1.616-1.1.noarch.rpm
+            wget -q -T 60 https://archives.jenkins-ci.org/redhat/jenkins-1.616-1.1.noarch.rpm
             rpm --install jenkins-1.616-1.1.noarch.rpm
 
             # configure Jenkins
