@@ -110,7 +110,7 @@ Resources:
     Properties:
       ApplicationName: !Ref EBWorkerApplication
       Description: 'Imagery worker: AWS in Action: chapter 16'
-      SolutionStackName: '64bit Amazon Linux 2018.03 v4.14.1 running Node.js'
+      SolutionStackName: '64bit Amazon Linux 2018.03 v4.17.9 running Node.js'
       OptionSettings:
       - Namespace: 'aws:autoscaling:launchconfiguration'
         OptionName: 'EC2KeyName'
@@ -223,7 +223,7 @@ Resources:
     Properties:
       ApplicationName: !Ref EBServerApplication
       Description: 'Imagery server: AWS in Action: chapter 16'
-      SolutionStackName: '64bit Amazon Linux 2018.03 v4.14.1 running Node.js'
+      SolutionStackName: '64bit Amazon Linux 2018.03 v4.17.9 running Node.js'
       OptionSettings:
       - Namespace: 'aws:autoscaling:asg'
         OptionName: 'MinSize'
