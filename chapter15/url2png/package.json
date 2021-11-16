@@ -1,6 +1,6 @@
 {
  "dependencies": {
-  "aws-sdk": "2.369.0",
+  "aws-sdk": "2.814.0",
   "uuid": "3.3.2",
   "node-webshot": "1.0.3"
  },
